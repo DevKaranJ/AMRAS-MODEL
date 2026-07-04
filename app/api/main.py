@@ -1,12 +1,62 @@
-from app.core.config import get_settings
+from typing import Any, Dict
+
+from fastapi import FastAPI, Request, status
+from fastapi.responses import JSONResponse
+
+from app.config.settings import settings
+from app.core.exceptions import AmrasException
 from app.core.logger import get_logger, setup_logging
 
 setup_logging()
-logger = get_logger(__name__)
+logger = get_logger("amras.api")
 
-def main() -> None:
-    settings = get_settings()
-    logger.info(f"Starting {settings.project_name} in {settings.environment} mode.")
+app = FastAPI(
+    title=settings.project_name,
+    version=settings.version,
+    description="API for AI Manga Recap Automation System",
+)
 
-if __name__ == "__main__":
-    main()
+
+@app.exception_handler(AmrasException)
+async def amras_exception_handler(request: Request, exc: AmrasException) -> JSONResponse:
+    logger.error("amras_exception", error=exc.to_dict(), path=request.url.path)
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"error": exc.to_dict()},
+    )
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    logger.exception("unhandled_exception", error=str(exc), path=request.url.path)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"error": {"error_code": "INTERNAL_ERROR", "message": "An unexpected error occurred."}},
+    )
+
+
+@app.get("/health", tags=["system"])
+async def health_check() -> Dict[str, Any]:
+    return {"status": "ok"}
+
+
+@app.get("/version", tags=["system"])
+async def version() -> Dict[str, Any]:
+    return {"version": settings.version}
+
+
+@app.get("/settings", tags=["system"])
+async def get_app_settings() -> Dict[str, Any]:
+    # Exclude sensitive info in a real app, just a skeleton for now
+    return settings.model_dump()
+
+
+# Skeleton jobs endpoints
+@app.post("/jobs", tags=["jobs"])
+async def create_job() -> Dict[str, Any]:
+    return {"status": "queued", "job_id": "123"}
+
+
+@app.get("/jobs/{job_id}", tags=["jobs"])
+async def get_job(job_id: str) -> Dict[str, Any]:
+    return {"job_id": job_id, "status": "running"}
