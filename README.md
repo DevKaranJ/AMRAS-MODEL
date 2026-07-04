@@ -7,10 +7,12 @@ A production-grade desktop application that converts complete manga series into 
 * **Testing:** Comprehensive test suites (Unit, Integration, E2E).
 * **Quality:** Strict typing, formatting, and linting.
 
-## Setup
+## Quickstart
 
 1. Install Poetry: `curl -sSL https://install.python-poetry.org | python3 -`
 2. Install Dependencies: `poetry install`
-3. Run Tests: `poetry run pytest`
+3. Run Database Migrations: `poetry run alembic upgrade head`
+4. Start Server: `poetry run uvicorn app.api.main:app --reload`
+5. Run Tests: `poetry run pytest`
 
-See `app/docs/ONBOARDING.md` for detailed developer guidelines.
+See `docs/ARCHITECTURE.md` and `docs/DEVELOPMENT.md` for more information.
