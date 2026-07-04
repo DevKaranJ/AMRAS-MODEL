@@ -19,7 +19,8 @@ app = FastAPI(
 
 @app.exception_handler(AmrasException)
 async def amras_exception_handler(request: Request, exc: AmrasException) -> JSONResponse:
-    logger.error("amras_exception", error=exc.to_dict(), path=request.url.path)
+    path = str(request.url.path).encode("unicode_escape").decode("utf-8")
+    logger.error("amras_exception", error=exc.to_dict(), path=path)
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={"error": exc.to_dict()},
@@ -28,7 +29,9 @@ async def amras_exception_handler(request: Request, exc: AmrasException) -> JSON
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    logger.exception("unhandled_exception", error=str(exc), path=request.url.path)
+    path = str(request.url.path).encode("unicode_escape").decode("utf-8")
+    msg = str(exc).encode("unicode_escape").decode("utf-8")
+    logger.exception("unhandled_exception", error=msg, path=path)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"error": {"error_code": "INTERNAL_ERROR", "message": "An unexpected error occurred."}},
@@ -47,8 +50,13 @@ async def version() -> Dict[str, Any]:
 
 @app.get("/settings", tags=["system"])
 async def get_app_settings() -> Dict[str, Any]:
-    # Exclude sensitive info in a real app, just a skeleton for now
-    return settings.model_dump()
+    data = settings.model_dump()
+    # Redact sensitive values
+    if "ai" in data and "api_key" in data["ai"]:
+        data["ai"]["api_key"] = "***"
+    if "db" in data and "url" in data["db"]:
+        data["db"]["url"] = "***"
+    return data
 
 
 # Skeleton jobs endpoints

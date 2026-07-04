@@ -28,23 +28,33 @@ def upgrade() -> None:
         sa.Column("name", sa.String(length=100), nullable=False),
         sa.Column("is_active", sa.Boolean(), nullable=False),
         sa.Column("config", sa.JSON(), nullable=False),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
     )
+
     op.create_table(
-        "job_logs",
+        "projects",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("job_id", sa.Integer(), nullable=False),
-        sa.Column("level", sa.String(length=20), nullable=False),
-        sa.Column("message", sa.Text(), nullable=False),
-        sa.Column("phase", sa.String(length=100), nullable=True),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
+        sa.Column("name", sa.String(length=255), nullable=False),
+        sa.Column("description", sa.Text(), nullable=True),
+        sa.Column("status", sa.String(length=50), nullable=False),
+        sa.Column("config", sa.JSON(), nullable=True),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(op.f("ix_job_logs_job_id"), "job_logs", ["job_id"], unique=False)
+    op.create_index(op.f("ix_projects_name"), "projects", ["name"], unique=False)
+
     op.create_table(
         "jobs",
         sa.Column("id", sa.Integer(), nullable=False),
@@ -54,30 +64,46 @@ def upgrade() -> None:
         sa.Column("payload", sa.JSON(), nullable=True),
         sa.Column("result", sa.JSON(), nullable=True),
         sa.Column("error", sa.Text(), nullable=True),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
+        sa.ForeignKeyConstraint(["project_id"], ["projects.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_jobs_project_id"), "jobs", ["project_id"], unique=False)
     op.create_index(op.f("ix_jobs_status"), "jobs", ["status"], unique=False)
+
     op.create_table(
-        "projects",
+        "job_logs",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("name", sa.String(length=255), nullable=False),
-        sa.Column("description", sa.Text(), nullable=True),
-        sa.Column("status", sa.String(length=50), nullable=False),
-        sa.Column("config", sa.JSON(), nullable=True),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
+        sa.Column("job_id", sa.Integer(), nullable=False),
+        sa.Column("level", sa.String(length=20), nullable=False),
+        sa.Column("message", sa.Text(), nullable=False),
+        sa.Column("phase", sa.String(length=100), nullable=True),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
+        sa.ForeignKeyConstraint(["job_id"], ["jobs.id"]),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(op.f("ix_projects_name"), "projects", ["name"], unique=False)
+    op.create_index(op.f("ix_job_logs_job_id"), "job_logs", ["job_id"], unique=False)
+
     op.create_table(
         "settings",
         sa.Column("key", sa.String(length=255), nullable=False),
         sa.Column("value", sa.JSON(), nullable=False),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
         sa.PrimaryKeyConstraint("key"),
     )
     op.create_table(
@@ -86,8 +112,12 @@ def upgrade() -> None:
         sa.Column("component", sa.String(length=100), nullable=False),
         sa.Column("status", sa.String(length=50), nullable=False),
         sa.Column("details", sa.JSON(), nullable=True),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
+        sa.Column(
+            "created_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
+        sa.Column(
+            "updated_at", sa.DateTime(timezone=True), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("component"),
     )
@@ -99,12 +129,16 @@ def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table("system_state")
     op.drop_table("settings")
-    op.drop_index(op.f("ix_projects_name"), table_name="projects")
-    op.drop_table("projects")
+
+    op.drop_index(op.f("ix_job_logs_job_id"), table_name="job_logs")
+    op.drop_table("job_logs")
+
     op.drop_index(op.f("ix_jobs_status"), table_name="jobs")
     op.drop_index(op.f("ix_jobs_project_id"), table_name="jobs")
     op.drop_table("jobs")
-    op.drop_index(op.f("ix_job_logs_job_id"), table_name="job_logs")
-    op.drop_table("job_logs")
+
+    op.drop_index(op.f("ix_projects_name"), table_name="projects")
+    op.drop_table("projects")
+
     op.drop_table("ai_providers")
     # ### end Alembic commands ###

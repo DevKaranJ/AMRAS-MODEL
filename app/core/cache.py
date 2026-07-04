@@ -1,6 +1,7 @@
 import json
 import time
 from abc import ABC, abstractmethod
+from hashlib import sha256
 from pathlib import Path
 from typing import Any, Optional
 
@@ -34,14 +35,14 @@ class MemoryCache(CacheBackend):
         if not item:
             return None
 
-        if item["expires_at"] and item["expires_at"] < time.time():
+        if item["expires_at"] is not None and item["expires_at"] <= time.time():
             await self.delete(key)
             return None
 
         return item["value"]
 
     async def set(self, key: str, value: Any, ttl: Optional[int] = None) -> None:
-        expires_at = time.time() + ttl if ttl else None
+        expires_at = time.time() + ttl if ttl is not None else None
         self._cache[key] = {"value": value, "expires_at": expires_at}
 
     async def delete(self, key: str) -> None:
@@ -57,9 +58,8 @@ class DiskCache(CacheBackend):
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def _get_path(self, key: str) -> Path:
-        # Simple sanitization for file names
-        safe_key = "".join(c for c in key if c.isalnum() or c in ("-", "_")).rstrip()
-        return self.cache_dir / f"{safe_key}.json"
+        key_hash = sha256(key.encode("utf-8")).hexdigest()
+        return self.cache_dir / f"cache_{key_hash}.json"
 
     async def get(self, key: str) -> Optional[Any]:
         path = self._get_path(key)
@@ -70,7 +70,7 @@ class DiskCache(CacheBackend):
             with open(path, "r") as f:
                 data = json.load(f)
 
-            if data.get("expires_at") and data["expires_at"] < time.time():
+            if data.get("expires_at") is not None and data["expires_at"] <= time.time():
                 await self.delete(key)
                 return None
 
@@ -80,7 +80,7 @@ class DiskCache(CacheBackend):
 
     async def set(self, key: str, value: Any, ttl: Optional[int] = None) -> None:
         path = self._get_path(key)
-        expires_at = time.time() + ttl if ttl else None
+        expires_at = time.time() + ttl if ttl is not None else None
 
         data = {"value": value, "expires_at": expires_at}
         with open(path, "w") as f:

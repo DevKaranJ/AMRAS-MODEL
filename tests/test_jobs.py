@@ -1,9 +1,7 @@
-from typing import Any
-
 import pytest
-
+import asyncio
+from typing import Any
 from app.jobs.base import BaseJob, JobContext, JobStatus
-
 
 class DummyJob(BaseJob):
     async def execute(self, **kwargs: Any) -> Any:
@@ -15,7 +13,6 @@ class DummyJob(BaseJob):
         self.context.status = JobStatus.COMPLETED
         self.context.result = {"success": True}
         return self.context.result
-
 
 @pytest.mark.asyncio
 async def test_job_execution() -> None:
@@ -34,7 +31,6 @@ async def test_job_execution() -> None:
     assert await job.get_status() == JobStatus.COMPLETED
     assert context.result == {"success": True}
 
-
 @pytest.mark.asyncio
 async def test_job_failure() -> None:
     context = JobContext(job_id="test_job_2")
@@ -46,7 +42,6 @@ async def test_job_failure() -> None:
     assert await job.get_status() == JobStatus.FAILED
     assert context.error == "Simulated failure"
 
-
 @pytest.mark.asyncio
 async def test_job_pause_resume_cancel() -> None:
     context = JobContext(job_id="test_job_3")
@@ -56,7 +51,7 @@ async def test_job_pause_resume_cancel() -> None:
     assert await job.get_status() == JobStatus.PAUSED
 
     await job.resume()
-    assert await job.get_status() == JobStatus.RESUMED
+    assert await job.get_status() == JobStatus.RUNNING
 
     await job.cancel()
     assert await job.get_status() == JobStatus.CANCELLED

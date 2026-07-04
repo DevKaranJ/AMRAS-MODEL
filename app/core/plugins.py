@@ -1,5 +1,7 @@
+import importlib
+import inspect
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Type
 
 from app.core.exceptions import PluginError
 
@@ -47,7 +49,7 @@ class PluginManager:
 
     def list_plugins(self, category: str) -> Dict[str, PluginInterface]:
         """List all plugins in a category."""
-        return self._plugins.get(category, {})
+        return self._plugins.get(category, {}).copy()
 
 
 # Global plugin manager instance

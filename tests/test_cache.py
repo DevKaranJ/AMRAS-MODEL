@@ -1,10 +1,7 @@
+import pytest
 import asyncio
 from pathlib import Path
-
-import pytest
-
-from app.core.cache import DiskCache, MemoryCache
-
+from app.core.cache import MemoryCache, DiskCache
 
 @pytest.mark.asyncio
 async def test_memory_cache_read_write() -> None:
@@ -13,19 +10,25 @@ async def test_memory_cache_read_write() -> None:
     val = await cache.get("key1")
     assert val == "value1"
 
-
 @pytest.mark.asyncio
-async def test_memory_cache_expiration() -> None:
+async def test_memory_cache_expiration(monkeypatch: pytest.MonkeyPatch) -> None:
     cache = MemoryCache()
+    import time
+
+    current_time = time.time()
+    def mock_time() -> float:
+        return current_time
+    monkeypatch.setattr("time.time", mock_time)
+
     await cache.set("key2", "value2", ttl=1)
     val = await cache.get("key2")
     assert val == "value2"
 
-    await asyncio.sleep(1.1)
+    # Simulate time passing
+    current_time += 1.1
 
     val_expired = await cache.get("key2")
     assert val_expired is None
-
 
 @pytest.mark.asyncio
 async def test_disk_cache_read_write(tmp_path: Path) -> None:
@@ -37,13 +40,20 @@ async def test_disk_cache_read_write(tmp_path: Path) -> None:
     await cache.delete("key3")
     assert await cache.get("key3") is None
 
-
 @pytest.mark.asyncio
-async def test_disk_cache_expiration(tmp_path: Path) -> None:
+async def test_disk_cache_expiration(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     cache = DiskCache(cache_dir=tmp_path)
+    import time
+
+    current_time = time.time()
+    def mock_time() -> float:
+        return current_time
+    monkeypatch.setattr("time.time", mock_time)
+
     await cache.set("key4", "value4", ttl=1)
 
-    await asyncio.sleep(1.1)
+    # Simulate time passing
+    current_time += 1.1
 
     val_expired = await cache.get("key4")
     assert val_expired is None

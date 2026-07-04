@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, Dict, Optional
+from uuid import UUID
 
 
 class JobStatus(str, Enum):
@@ -34,7 +35,7 @@ class BaseJob(ABC):
         self.context.status = JobStatus.PAUSED
 
     async def resume(self) -> None:
-        self.context.status = JobStatus.RESUMED
+        self.context.status = JobStatus.RUNNING
 
     async def cancel(self) -> None:
         self.context.status = JobStatus.CANCELLED
