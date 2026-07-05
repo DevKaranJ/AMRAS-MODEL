@@ -1,7 +1,9 @@
-import pytest
-import asyncio
 from typing import Any
+
+import pytest
+
 from app.jobs.base import BaseJob, JobContext, JobStatus
+
 
 class DummyJob(BaseJob):
     async def execute(self, **kwargs: Any) -> Any:

@@ -3,6 +3,7 @@ from typing import Any, Dict
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
+from app.api.endpoints.ingestion import router as ingestion_router
 from app.config.settings import settings
 from app.core.exceptions import AmrasException
 from app.core.logger import get_logger, setup_logging
@@ -15,6 +16,8 @@ app = FastAPI(
     version=settings.version,
     description="API for AI Manga Recap Automation System",
 )
+
+app.include_router(ingestion_router, prefix="/ingestion", tags=["ingestion"])
 
 
 @app.exception_handler(AmrasException)
