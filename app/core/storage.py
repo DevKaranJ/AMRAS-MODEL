@@ -1,9 +1,10 @@
-import os
 import shutil
 from pathlib import Path
 from typing import IO, Union
+
 from app.config.settings import settings
 from app.core.exceptions import StorageError
+
 
 class StorageManager:
     def __init__(self, base_dir: Union[str, Path]):

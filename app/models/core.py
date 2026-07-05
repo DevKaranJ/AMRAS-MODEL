@@ -1,7 +1,10 @@
-from typing import Optional, Dict, Any
-from sqlalchemy import String, JSON, Boolean, Text, ForeignKey
+from typing import Any, Dict, Optional
+
+from sqlalchemy import JSON, Boolean, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
+
 from app.models.base import Base, TimestampMixin
+
 
 class Project(Base, TimestampMixin):
     __tablename__ = "projects"
