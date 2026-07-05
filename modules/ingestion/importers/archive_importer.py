@@ -20,6 +20,10 @@ class ArchiveImporter(BaseImporter):
         """Imports a manga from a ZIP/CBZ archive."""
         logger.info("importing_from_archive", source=str(source), manga_id=manga_id)
 
+        # Reject unsupported extensions
+        if source.suffix.lower() not in [".zip", ".cbz"]:
+            raise ValueError(f"Unsupported archive format: {source.suffix}")
+
         extract_dir = Path(tempfile.mkdtemp())
         try:
             if source.suffix.lower() == ".zip":

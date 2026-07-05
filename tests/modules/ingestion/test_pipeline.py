@@ -4,9 +4,8 @@ from typing import AsyncGenerator
 import pytest
 import pytest_asyncio
 from sqlalchemy import insert, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-from app.database.session import engine
 from app.models.base import Base
 from app.models.manga import ImportJob
 from modules.ingestion.agents.collection_agent import CollectionAgent
@@ -15,18 +14,21 @@ from modules.ingestion.agents.file_system_agent import FileSystemAgent
 from modules.ingestion.agents.metadata_agent import MetadataAgent
 from modules.ingestion.agents.validation_agent import ValidationAgent
 
+# Use a dedicated test database engine to avoid affecting dev.db
+test_engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+
 
 @pytest_asyncio.fixture
 async def setup_db() -> AsyncGenerator[None, None]:
-    async with engine.begin() as conn:
+    async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
-    async with engine.begin() as conn:
+    async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
 @pytest.mark.asyncio
 async def test_full_local_import_pipeline(tmp_path: Path, setup_db: None) -> None:
-    async with AsyncSession(engine) as session:
+    async with AsyncSession(test_engine) as session:
         # Create a dummy import job
         stmt = insert(ImportJob).values(status="queued").returning(ImportJob.id)
         result_id = await session.execute(stmt)

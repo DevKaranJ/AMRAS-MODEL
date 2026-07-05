@@ -1,6 +1,7 @@
 from typing import Optional
 
 from sqlalchemy import select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import get_logger
@@ -33,9 +34,17 @@ class DatabaseAgent(BaseIngestionAgent):
                 hash=metadata.hash
             )
             self.session.add(manga)
-            await self.session.commit()
-            await self.session.refresh(manga)
-            logger.info("created_manga", manga_id=manga.id, slug=manga.slug)
+            try:
+                await self.session.commit()
+                await self.session.refresh(manga)
+                logger.info("created_manga", manga_id=manga.id, slug=manga.slug)
+            except IntegrityError:
+                # Race condition: another process created the manga with this slug
+                await self.session.rollback()
+                # Re-query to get the existing manga
+                result = await self.session.execute(stmt)
+                manga = result.scalar_one()
+                logger.info("manga_already_exists", manga_id=manga.id, slug=manga.slug)
 
         return manga.id
 

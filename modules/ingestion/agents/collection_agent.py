@@ -53,6 +53,8 @@ class CollectionAgent(BaseIngestionAgent):
 
         except Exception as e:
             logger.exception("failed_process_import", source_path=str(source_path), job_id=import_job_id, error=str(e))
+            # Rollback any failed transaction before updating the job status
+            await self.database_agent.session.rollback()
             await self.database_agent.update_import_job(import_job_id, status="failed", error=str(e))
             raise e
 

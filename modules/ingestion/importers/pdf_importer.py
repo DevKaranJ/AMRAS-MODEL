@@ -1,3 +1,5 @@
+import asyncio
+import shutil
 import tempfile
 from pathlib import Path
 from typing import Any, Dict
@@ -18,15 +20,18 @@ class PDFImporter(BaseImporter):
         extract_dir = Path(tempfile.mkdtemp())
 
         try:
-            # We use pdf2image to convert PDF to images
-            # This is a blocking call, in a real system we would use a ThreadPoolExecutor
-            # or a specific async wrapper
-            pages = convert_from_path(str(source), output_folder=str(extract_dir), fmt="png")
+            # Offload PDF conversion to a thread to avoid blocking the event loop
+            pages = await asyncio.to_thread(
+                convert_from_path, str(source), output_folder=str(extract_dir), fmt="png"
+            )
 
             return {"imported_pages": len(pages), "manga_id": manga_id}
         except Exception as e:
             logger.error("pdf_import_failed", source=str(source), error=str(e))
             raise e
+        finally:
+            # Cleanup temporary directory
+            shutil.rmtree(extract_dir, ignore_errors=True)
 
     async def validate_source(self, source: Path) -> bool:
         """Validates if source is a PDF file."""

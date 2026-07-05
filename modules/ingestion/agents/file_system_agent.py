@@ -13,23 +13,52 @@ class FileSystemAgent(BaseIngestionAgent):
 
     async def process_source(self, source_path: Path, manga_title: str, manga_id: int) -> Dict[str, Any]:
         """Main entrypoint for processing file sources."""
-        # For a full implementation, we'd delegate to specific Importers here based on file type
-        # Returning a dummy structure for now
-        return {"processed_chapters": 0, "processed_pages": 0}
+        from modules.ingestion.importers.archive_importer import ArchiveImporter
+        from modules.ingestion.importers.folder_importer import FolderImporter
+        from modules.ingestion.importers.pdf_importer import PDFImporter
+
+        # Determine which importer to use based on source type
+        if source_path.is_dir():
+            importer = FolderImporter()
+        elif source_path.suffix.lower() in [".zip", ".cbz"]:
+            importer = ArchiveImporter(self)
+        elif source_path.suffix.lower() == ".pdf":
+            importer = PDFImporter()
+        else:
+            raise ValueError(f"Unsupported source type: {source_path}")
+
+        # Validate and import
+        if not await importer.validate_source(source_path):
+            raise ValueError(f"Invalid source for selected importer: {source_path}")
+
+        result = await importer.import_manga(source_path, manga_id)
+
+        # Normalize the result to include processed_chapters and processed_pages
+        processed_chapters = result.get("imported_chapters", 0)
+        processed_pages = result.get("imported_pages", 0)
+
+        return {"processed_chapters": processed_chapters, "processed_pages": processed_pages}
 
     async def move_file(self, src: Path, dest: Path) -> None:
         """Safely moves a file, creating directories if needed."""
         dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dest)
+        shutil.move(str(src), str(dest))
 
     async def extract_zip(self, zip_path: Path, extract_dir: Path) -> List[Path]:
         """Extracts a ZIP archive to a temporary directory."""
         extract_dir.mkdir(parents=True, exist_ok=True)
         extracted_files = []
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_dir)
             for name in zip_ref.namelist():
-                extracted_files.append(extract_dir / name)
+                # Validate path to prevent directory traversal
+                target_path = (extract_dir / name).resolve()
+                if not str(target_path).startswith(str(extract_dir.resolve())):
+                    logger.warning("path_traversal_detected", name=name, zip_path=str(zip_path))
+                    continue
+
+                # Extract the member safely
+                zip_ref.extract(name, extract_dir)
+                extracted_files.append(target_path)
         return extracted_files
 
     async def extract_cbz(self, cbz_path: Path, extract_dir: Path) -> List[Path]:

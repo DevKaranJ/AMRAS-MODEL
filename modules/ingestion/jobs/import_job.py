@@ -13,11 +13,14 @@ class ProcessImportJob(BaseJob):
         self.collection_agent = collection_agent
 
     async def execute(self, **kwargs: Any) -> Any:
-        source_path = Path(kwargs.get("source_path", ""))
+        source_path_raw = kwargs.get("source_path", "")
         import_job_id = kwargs.get("import_job_id")
 
-        if not source_path or not import_job_id:
+        # Validate raw values before converting to Path
+        if not source_path_raw or not import_job_id:
             raise ValueError("source_path and import_job_id are required")
+
+        source_path = Path(source_path_raw)
 
         self.context.status = JobStatus.RUNNING
 
