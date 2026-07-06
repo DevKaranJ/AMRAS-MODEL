@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.endpoints.ingestion import router as ingestion_router
 from app.api.endpoints.ocr import router as ocr_router
+from app.api.endpoints.story import router as story_router
 from app.api.endpoints.vision import router as vision_router
 from app.config.settings import settings
 from app.core.exceptions import AmrasException
@@ -22,6 +23,7 @@ app = FastAPI(
 app.include_router(ingestion_router, prefix="/ingestion", tags=["ingestion"])
 app.include_router(vision_router, prefix="/vision", tags=["vision"])
 app.include_router(ocr_router, prefix="/ocr", tags=["ocr"])
+app.include_router(story_router, prefix="/story", tags=["story"])
 
 
 @app.exception_handler(AmrasException)
