@@ -27,12 +27,22 @@ class Panel(Base, TimestampMixin):
     emotion: Mapped[Optional[str]] = mapped_column(String(100))
 
     # Relationships
-    speech_bubbles: Mapped[list["SpeechBubble"]] = relationship("SpeechBubble", lazy="selectin", cascade="all, delete-orphan")
+    speech_bubbles: Mapped[list["SpeechBubble"]] = relationship(
+        "SpeechBubble", lazy="selectin", cascade="all, delete-orphan"
+    )
     narrations: Mapped[list["Narration"]] = relationship("Narration", lazy="selectin", cascade="all, delete-orphan")
-    characters: Mapped[list["CharacterDetected"]] = relationship("CharacterDetected", lazy="selectin", cascade="all, delete-orphan")
-    objects: Mapped[list["ObjectDetected"]] = relationship("ObjectDetected", lazy="selectin", cascade="all, delete-orphan")
-    actions: Mapped[list["ActionDetected"]] = relationship("ActionDetected", lazy="selectin", cascade="all, delete-orphan")
-    sound_effects: Mapped[list["SoundEffect"]] = relationship("SoundEffect", lazy="selectin", cascade="all, delete-orphan")
+    characters: Mapped[list["CharacterDetected"]] = relationship(
+        "CharacterDetected", lazy="selectin", cascade="all, delete-orphan"
+    )
+    objects: Mapped[list["ObjectDetected"]] = relationship(
+        "ObjectDetected", lazy="selectin", cascade="all, delete-orphan"
+    )
+    actions: Mapped[list["ActionDetected"]] = relationship(
+        "ActionDetected", lazy="selectin", cascade="all, delete-orphan"
+    )
+    sound_effects: Mapped[list["SoundEffect"]] = relationship(
+        "SoundEffect", lazy="selectin", cascade="all, delete-orphan"
+    )
 
 
 class SpeechBubble(Base, TimestampMixin):

@@ -19,9 +19,7 @@ class VisionPipeline:
         """Runs the vision pipeline for a page"""
         try:
             # Update job status to processing
-            await session.execute(
-                update(VisionJob).where(VisionJob.id == job_id).values(status="processing")
-            )
+            await session.execute(update(VisionJob).where(VisionJob.id == job_id).values(status="processing"))
             await session.commit()
 
             payload = {"page_id": page_id}
@@ -96,9 +94,7 @@ class VisionPipeline:
             await session.commit()
 
             # Update job status to completed
-            await session.execute(
-                update(VisionJob).where(VisionJob.id == job_id).values(status="completed")
-            )
+            await session.execute(update(VisionJob).where(VisionJob.id == job_id).values(status="completed"))
             await session.commit()
 
             return {
@@ -110,8 +106,6 @@ class VisionPipeline:
             }
         except Exception as e:
             # Mark job as failed
-            await session.execute(
-                update(VisionJob).where(VisionJob.id == job_id).values(status="failed", error=str(e))
-            )
+            await session.execute(update(VisionJob).where(VisionJob.id == job_id).values(status="failed", error=str(e)))
             await session.commit()
             raise
