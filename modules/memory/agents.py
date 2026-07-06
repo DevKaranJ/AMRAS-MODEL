@@ -19,7 +19,7 @@ class BaseMemoryAgent:
 class CharacterMemoryAgent(BaseMemoryAgent):
     async def update_character(self, entity_id: str, data: Dict[str, Any], confidence: float = 1.0) -> CharacterMemory:
         # 1. Update Core MemoryStore
-        await self.manager.store_memory(
+        memory_store = await self.manager.store_memory(
             entity_id=entity_id,
             entity_type="character",
             memory_type="character",
@@ -29,13 +29,13 @@ class CharacterMemoryAgent(BaseMemoryAgent):
         )
 
         # 2. Update CharacterMemory specific table
-        stmt = select(CharacterMemory).where(CharacterMemory.name == data.get("name"))
+        stmt = select(CharacterMemory).where(CharacterMemory.memory_id == memory_store.id)
         result = await self.session.execute(stmt)
         char_mem = result.scalar_one_or_none()
 
         if not char_mem:
             char_mem = CharacterMemory(
-                memory_id=1,  # This is a simplification. Should get proper ID from memory store
+                memory_id=memory_store.id,
                 name=data.get("name", entity_id),
                 aliases=data.get("aliases", []),
                 current_status=data.get("current_status"),
@@ -57,7 +57,7 @@ class CharacterMemoryAgent(BaseMemoryAgent):
 
 class EventMemoryAgent(BaseMemoryAgent):
     async def update_event(self, entity_id: str, data: Dict[str, Any], confidence: float = 1.0) -> EventMemory:
-        await self.manager.store_memory(
+        memory_store = await self.manager.store_memory(
             entity_id=entity_id,
             entity_type="event",
             memory_type="event",
@@ -66,13 +66,13 @@ class EventMemoryAgent(BaseMemoryAgent):
             change_reason="Event update",
         )
 
-        stmt = select(EventMemory).where(EventMemory.name == data.get("name"))
+        stmt = select(EventMemory).where(EventMemory.memory_id == memory_store.id)
         result = await self.session.execute(stmt)
         event_mem = result.scalar_one_or_none()
 
         if not event_mem:
             event_mem = EventMemory(
-                memory_id=1,
+                memory_id=memory_store.id,
                 name=data.get("name", entity_id),
                 event_type=data.get("event_type", "unknown"),
                 importance=data.get("importance", 1),
@@ -92,7 +92,7 @@ class RelationshipMemoryAgent(BaseMemoryAgent):
     async def update_relationship(
         self, entity_id: str, data: Dict[str, Any], confidence: float = 1.0
     ) -> RelationshipMemory:
-        await self.manager.store_memory(
+        memory_store = await self.manager.store_memory(
             entity_id=entity_id,
             entity_type="relationship",
             memory_type="relationship",
@@ -101,16 +101,13 @@ class RelationshipMemoryAgent(BaseMemoryAgent):
             change_reason="Relationship update",
         )
 
-        stmt = select(RelationshipMemory).where(
-            RelationshipMemory.source_entity_id == data.get("source_entity_id"),
-            RelationshipMemory.target_entity_id == data.get("target_entity_id"),
-        )
+        stmt = select(RelationshipMemory).where(RelationshipMemory.memory_id == memory_store.id)
         result = await self.session.execute(stmt)
         rel_mem = result.scalar_one_or_none()
 
         if not rel_mem:
             rel_mem = RelationshipMemory(
-                memory_id=1,
+                memory_id=memory_store.id,
                 source_entity_id=data.get("source_entity_id", "unknown"),
                 target_entity_id=data.get("target_entity_id", "unknown"),
                 relationship_type=data.get("relationship_type", "unknown"),

@@ -1,8 +1,11 @@
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import get_logger
+from app.database.session import get_db_session
+from app.models.memory import CharacterMemory, ConflictReport, EventMemory, MemoryStore, WorldMemory
 from app.schemas.memory import (
     CharacterMemoryRead,
     ConflictReportRead,
@@ -12,25 +15,31 @@ from app.schemas.memory import (
     MemoryStoreRead,
     WorldMemoryRead,
 )
+from modules.memory.core import MemoryManagerAgent
 
 logger = get_logger("amras.api.memory")
 router = APIRouter()
 
 
 @router.post("/update", response_model=MemoryStoreRead, status_code=status.HTTP_201_CREATED)
-async def update_memory(memory_in: MemoryStoreCreate) -> Any:
+async def update_memory(
+    memory_in: MemoryStoreCreate,
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
     """
     Store or update a memory in the system.
     """
     logger.info("memory_update_requested", entity_id=memory_in.entity_id)
-    # Placeholder implementation
-    return {
-        "id": 1,
-        "version": 1,
-        "created_at": "2023-01-01T00:00:00Z",
-        "updated_at": "2023-01-01T00:00:00Z",
-        **memory_in.model_dump(),
-    }
+    manager = MemoryManagerAgent(db)
+    memory = await manager.store_memory(
+        entity_id=memory_in.entity_id,
+        entity_type=memory_in.entity_type,
+        memory_type=memory_in.memory_type,
+        data=memory_in.data,
+        confidence=memory_in.confidence,
+        change_reason="API update",
+    )
+    return memory
 
 
 @router.post("/rebuild", status_code=status.HTTP_202_ACCEPTED)
@@ -47,58 +56,133 @@ async def get_memories(
     entity_type: str | None = Query(None, description="Filter by entity type"),
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db_session),
 ) -> Any:
     """
     Retrieve a list of memories.
     """
-    return []
+    from sqlalchemy.future import select
+
+    stmt = select(MemoryStore)
+    if entity_type:
+        stmt = stmt.where(MemoryStore.entity_type == entity_type)
+    stmt = stmt.limit(limit).offset(offset)
+    result = await db.execute(stmt)
+    memories = result.scalars().all()
+    return memories
 
 
 @router.get("/character/{name}", response_model=CharacterMemoryRead)
-async def get_character_memory(name: str) -> Any:
+async def get_character_memory(
+    name: str,
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
     """
     Retrieve character memory by name.
     """
-    raise HTTPException(status_code=404, detail="Character memory not found")
+    from sqlalchemy.future import select
+
+    stmt = select(CharacterMemory).where(CharacterMemory.name == name)
+    result = await db.execute(stmt)
+    character = result.scalar_one_or_none()
+    if not character:
+        raise HTTPException(status_code=404, detail="Character memory not found")
+    return character
 
 
 @router.get("/event/{name}", response_model=EventMemoryRead)
-async def get_event_memory(name: str) -> Any:
+async def get_event_memory(
+    name: str,
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
     """
     Retrieve event memory by name.
     """
-    raise HTTPException(status_code=404, detail="Event memory not found")
+    from sqlalchemy.future import select
+
+    stmt = select(EventMemory).where(EventMemory.name == name)
+    result = await db.execute(stmt)
+    event = result.scalar_one_or_none()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event memory not found")
+    return event
 
 
 @router.get("/location/{name}", response_model=WorldMemoryRead)
-async def get_location_memory(name: str) -> Any:
+async def get_location_memory(
+    name: str,
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
     """
     Retrieve world/location memory by name.
     """
-    raise HTTPException(status_code=404, detail="Location memory not found")
+    from sqlalchemy.future import select
+
+    stmt = select(WorldMemory).where(WorldMemory.name == name)
+    result = await db.execute(stmt)
+    location = result.scalar_one_or_none()
+    if not location:
+        raise HTTPException(status_code=404, detail="Location memory not found")
+    return location
 
 
 @router.post("/search", response_model=List[MemoryStoreRead])
-async def search_memory(search_request: MemorySearchRequest) -> Any:
+async def search_memory(
+    search_request: MemorySearchRequest,
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
     """
     Search memory via keyword or semantic search.
     """
-    return []
+    from sqlalchemy.future import select
+
+    stmt = select(MemoryStore)
+    if search_request.entity_type:
+        stmt = stmt.where(MemoryStore.entity_type == search_request.entity_type)
+    if search_request.memory_type:
+        stmt = stmt.where(MemoryStore.memory_type == search_request.memory_type)
+    # Basic keyword search in JSON data (implementation depends on DB)
+    # For now, we'll just filter by type and return limited results
+    stmt = stmt.limit(search_request.limit)
+    result = await db.execute(stmt)
+    memories = result.scalars().all()
+    return memories
 
 
 @router.get("/history/{entity_id}", response_model=List[Dict[str, Any]])
-async def get_memory_history(entity_id: str) -> Any:
+async def get_memory_history(
+    entity_id: str,
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
     """
     Retrieve the version history of a specific memory.
     """
-    return []
+    manager = MemoryManagerAgent(db)
+    versions = await manager.get_memory_history(entity_id)
+    return [
+        {
+            "version": v.version,
+            "data": v.data,
+            "change_reason": v.change_reason,
+            "created_at": v.created_at.isoformat() if v.created_at else None,
+        }
+        for v in versions
+    ]
 
 
 @router.get("/conflicts", response_model=List[ConflictReportRead])
 async def get_memory_conflicts(
     resolved: bool | None = Query(None, description="Filter by resolution status"),
+    db: AsyncSession = Depends(get_db_session),
 ) -> Any:
     """
     Retrieve detected memory conflicts.
     """
-    return []
+    from sqlalchemy.future import select
+
+    stmt = select(ConflictReport)
+    if resolved is not None:
+        stmt = stmt.where(ConflictReport.resolved == resolved)
+    result = await db.execute(stmt)
+    conflicts = result.scalars().all()
+    return conflicts

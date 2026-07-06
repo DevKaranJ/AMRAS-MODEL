@@ -35,7 +35,7 @@ class MemoryVersion(Base, TimestampMixin):
 class CharacterMemory(Base, TimestampMixin):
     __tablename__ = "character_memories"
     id: Mapped[int] = mapped_column(primary_key=True)
-    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True)
+    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True, unique=True)
     name: Mapped[str] = mapped_column(String(255), index=True)
     aliases: Mapped[Optional[List[str]]] = mapped_column(JSON)
     current_status: Mapped[Optional[str]] = mapped_column(String(100))
@@ -46,7 +46,7 @@ class CharacterMemory(Base, TimestampMixin):
 class RelationshipMemory(Base, TimestampMixin):
     __tablename__ = "relationship_memories"
     id: Mapped[int] = mapped_column(primary_key=True)
-    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True)
+    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True, unique=True)
     source_entity_id: Mapped[str] = mapped_column(String(100), index=True)
     target_entity_id: Mapped[str] = mapped_column(String(100), index=True)
     relationship_type: Mapped[str] = mapped_column(String(100))  # e.g. friend, enemy, master
@@ -57,7 +57,7 @@ class RelationshipMemory(Base, TimestampMixin):
 class EventMemory(Base, TimestampMixin):
     __tablename__ = "event_memories"
     id: Mapped[int] = mapped_column(primary_key=True)
-    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True)
+    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True, unique=True)
     name: Mapped[str] = mapped_column(String(255), index=True)
     event_type: Mapped[str] = mapped_column(String(100))
     importance: Mapped[int] = mapped_column(Integer, default=1)
@@ -68,7 +68,7 @@ class EventMemory(Base, TimestampMixin):
 class WorldMemory(Base, TimestampMixin):
     __tablename__ = "world_memories"
     id: Mapped[int] = mapped_column(primary_key=True)
-    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True)
+    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True, unique=True)
     name: Mapped[str] = mapped_column(String(255), index=True)
     location_type: Mapped[str] = mapped_column(String(100))  # country, city, organization, etc.
     description: Mapped[Optional[str]] = mapped_column(Text)
@@ -77,7 +77,7 @@ class WorldMemory(Base, TimestampMixin):
 class ObjectMemory(Base, TimestampMixin):
     __tablename__ = "object_memories"
     id: Mapped[int] = mapped_column(primary_key=True)
-    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True)
+    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True, unique=True)
     name: Mapped[str] = mapped_column(String(255), index=True)
     object_type: Mapped[str] = mapped_column(String(100))  # weapon, artifact, etc.
     owner_id: Mapped[Optional[str]] = mapped_column(String(100), index=True)
@@ -86,7 +86,7 @@ class ObjectMemory(Base, TimestampMixin):
 class AbilityMemory(Base, TimestampMixin):
     __tablename__ = "ability_memories"
     id: Mapped[int] = mapped_column(primary_key=True)
-    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True)
+    memory_id: Mapped[int] = mapped_column(ForeignKey("memory_store.id", ondelete="CASCADE"), index=True, unique=True)
     name: Mapped[str] = mapped_column(String(255), index=True)
     ability_type: Mapped[str] = mapped_column(String(100))  # skill, magic, etc.
     owner_id: Mapped[Optional[str]] = mapped_column(String(100), index=True)
