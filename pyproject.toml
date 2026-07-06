@@ -1,3 +1,9 @@
+[tool.poetry]
+packages = [
+    { include = "app" },
+    { include = "modules" }
+]
+
 [project]
 name = "amras"
 version = "0.1.0"

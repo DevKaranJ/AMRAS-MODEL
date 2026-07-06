@@ -6,6 +6,7 @@ from modules.ingestion.importers.remote_importer import RemoteProvider
 
 logger = get_logger("amras.ingestion.download_job")
 
+
 class ProcessDownloadJob(BaseJob):
     """Job to handle remote downloading of manga."""
 

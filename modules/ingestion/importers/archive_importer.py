@@ -10,8 +10,8 @@ from modules.ingestion.importers.folder_importer import FolderImporter
 
 logger = get_logger("amras.ingestion.archive_importer")
 
-class ArchiveImporter(BaseImporter):
 
+class ArchiveImporter(BaseImporter):
     def __init__(self, file_system_agent: FileSystemAgent):
         self.file_system_agent = file_system_agent
         self.folder_importer = FolderImporter()

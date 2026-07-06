@@ -9,8 +9,8 @@ from modules.ingestion.agents.base import BaseIngestionAgent
 
 logger = get_logger("amras.ingestion.file_system_agent")
 
-class FileSystemAgent(BaseIngestionAgent):
 
+class FileSystemAgent(BaseIngestionAgent):
     async def process_source(self, source_path: Path, manga_title: str, manga_id: int) -> Dict[str, Any]:
         """Main entrypoint for processing file sources."""
         from modules.ingestion.importers.archive_importer import ArchiveImporter
@@ -48,7 +48,7 @@ class FileSystemAgent(BaseIngestionAgent):
         """Extracts a ZIP archive to a temporary directory."""
         extract_dir.mkdir(parents=True, exist_ok=True)
         extracted_files = []
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
             for name in zip_ref.namelist():
                 # Validate path to prevent directory traversal
                 target_path = (extract_dir / name).resolve()
@@ -76,12 +76,13 @@ class FileSystemAgent(BaseIngestionAgent):
     async def normalize_image(self, src: Path, dest: Path) -> Dict[str, Any]:
         """Converts an image to a normalized PNG."""
         from PIL import Image
+
         dest.parent.mkdir(parents=True, exist_ok=True)
         try:
             with Image.open(src) as img:
                 # Convert to RGB to normalize color space (removes alpha if not needed or normalizes palettes)
-                if img.mode not in ('RGB', 'RGBA'):
-                    img = img.convert('RGB') # type: ignore
+                if img.mode not in ("RGB", "RGBA"):
+                    img = img.convert("RGB")  # type: ignore
                 img.save(dest, format="PNG")
                 return {"width": img.width, "height": img.height}
         except Exception as e:

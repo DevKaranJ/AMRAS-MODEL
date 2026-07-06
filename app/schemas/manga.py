@@ -72,4 +72,5 @@ class PageRead(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+
 MangaRead.model_rebuild()

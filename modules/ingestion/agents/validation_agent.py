@@ -5,8 +5,8 @@ from modules.ingestion.agents.base import BaseIngestionAgent
 
 logger = get_logger("amras.ingestion.validation_agent")
 
-class ValidationAgent(BaseIngestionAgent):
 
+class ValidationAgent(BaseIngestionAgent):
     async def validate_page(self, page_path: Path) -> bool:
         """Validates that an image file is not corrupted and is readable."""
         if not page_path.exists():
@@ -14,6 +14,7 @@ class ValidationAgent(BaseIngestionAgent):
 
         try:
             from PIL import Image
+
             with Image.open(page_path) as img:
                 img.verify()
             return True

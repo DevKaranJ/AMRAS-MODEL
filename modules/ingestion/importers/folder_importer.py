@@ -6,8 +6,8 @@ from modules.ingestion.importers.base import BaseImporter
 
 logger = get_logger("amras.ingestion.folder_importer")
 
-class FolderImporter(BaseImporter):
 
+class FolderImporter(BaseImporter):
     async def import_manga(self, source: Path, manga_id: int) -> Dict[str, Any]:
         """Imports a manga from a local folder."""
         logger.info("importing_from_folder", source=str(source), manga_id=manga_id)

@@ -12,14 +12,17 @@ async def test_memory_cache_read_write() -> None:
     val = await cache.get("key1")
     assert val == "value1"
 
+
 @pytest.mark.asyncio
 async def test_memory_cache_expiration(monkeypatch: pytest.MonkeyPatch) -> None:
     cache = MemoryCache()
     import time
 
     current_time = time.time()
+
     def mock_time() -> float:
         return current_time
+
     monkeypatch.setattr("time.time", mock_time)
 
     await cache.set("key2", "value2", ttl=1)
@@ -32,6 +35,7 @@ async def test_memory_cache_expiration(monkeypatch: pytest.MonkeyPatch) -> None:
     val_expired = await cache.get("key2")
     assert val_expired is None
 
+
 @pytest.mark.asyncio
 async def test_disk_cache_read_write(tmp_path: Path) -> None:
     cache = DiskCache(cache_dir=tmp_path)
@@ -42,14 +46,17 @@ async def test_disk_cache_read_write(tmp_path: Path) -> None:
     await cache.delete("key3")
     assert await cache.get("key3") is None
 
+
 @pytest.mark.asyncio
 async def test_disk_cache_expiration(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     cache = DiskCache(cache_dir=tmp_path)
     import time
 
     current_time = time.time()
+
     def mock_time() -> float:
         return current_time
+
     monkeypatch.setattr("time.time", mock_time)
 
     await cache.set("key4", "value4", ttl=1)

@@ -11,8 +11,8 @@ from modules.ingestion.importers.base import BaseImporter
 
 logger = get_logger("amras.ingestion.pdf_importer")
 
-class PDFImporter(BaseImporter):
 
+class PDFImporter(BaseImporter):
     async def import_manga(self, source: Path, manga_id: int) -> Dict[str, Any]:
         """Imports a manga from a PDF file."""
         logger.info("importing_from_pdf", source=str(source), manga_id=manga_id)
@@ -21,9 +21,7 @@ class PDFImporter(BaseImporter):
 
         try:
             # Offload PDF conversion to a thread to avoid blocking the event loop
-            pages = await asyncio.to_thread(
-                convert_from_path, str(source), output_folder=str(extract_dir), fmt="png"
-            )
+            pages = await asyncio.to_thread(convert_from_path, str(source), output_folder=str(extract_dir), fmt="png")
 
             return {"imported_pages": len(pages), "manga_id": manga_id}
         except Exception as e:
