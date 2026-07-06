@@ -1,6 +1,33 @@
 from app.models.base import Base
 from app.models.core import AIProvider, Job, JobLog, Project, Setting, SystemState
 from app.models.manga import Chapter, DownloadJob, ImportJob, Manga, Page
+from app.models.memory import (
+    AbilityMemory,
+    CharacterMemory,
+    ConflictReport,
+    Embedding,
+    EventMemory,
+    KnowledgeGraphEdge,
+    KnowledgeGraphNode,
+    MemoryAudit,
+    MemoryStore,
+    MemoryVersion,
+    ObjectMemory,
+    RelationshipMemory,
+    RetrievalIndex,
+    WorldMemory,
+)
+from app.models.vision import (
+    ActionDetected,
+    CharacterDetected,
+    ConfidenceScore,
+    Narration,
+    ObjectDetected,
+    Panel,
+    SoundEffect,
+    SpeechBubble,
+    VisionJob,
+)
 
 __all__ = [
     "ActionDetected",
@@ -24,15 +51,18 @@ __all__ = [
     "Page",
     "ImportJob",
     "DownloadJob",
+    "MemoryStore",
+    "MemoryVersion",
+    "CharacterMemory",
+    "RelationshipMemory",
+    "EventMemory",
+    "WorldMemory",
+    "ObjectMemory",
+    "AbilityMemory",
+    "Embedding",
+    "KnowledgeGraphNode",
+    "KnowledgeGraphEdge",
+    "MemoryAudit",
+    "ConflictReport",
+    "RetrievalIndex",
 ]
-from app.models.vision import (
-    ActionDetected,
-    CharacterDetected,
-    ConfidenceScore,
-    Narration,
-    ObjectDetected,
-    Panel,
-    SoundEffect,
-    SpeechBubble,
-    VisionJob,
-)
