@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
 from sqlalchemy import JSON, Boolean, Float, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin
 
@@ -25,6 +25,14 @@ class Panel(Base, TimestampMixin):
     bounding_box: Mapped[Any] = mapped_column(JSON)
     scene_type: Mapped[Optional[str]] = mapped_column(String(100))
     emotion: Mapped[Optional[str]] = mapped_column(String(100))
+
+    # Relationships
+    speech_bubbles: Mapped[list["SpeechBubble"]] = relationship("SpeechBubble", lazy="selectin", cascade="all, delete-orphan")
+    narrations: Mapped[list["Narration"]] = relationship("Narration", lazy="selectin", cascade="all, delete-orphan")
+    characters: Mapped[list["CharacterDetected"]] = relationship("CharacterDetected", lazy="selectin", cascade="all, delete-orphan")
+    objects: Mapped[list["ObjectDetected"]] = relationship("ObjectDetected", lazy="selectin", cascade="all, delete-orphan")
+    actions: Mapped[list["ActionDetected"]] = relationship("ActionDetected", lazy="selectin", cascade="all, delete-orphan")
+    sound_effects: Mapped[list["SoundEffect"]] = relationship("SoundEffect", lazy="selectin", cascade="all, delete-orphan")
 
 
 class SpeechBubble(Base, TimestampMixin):

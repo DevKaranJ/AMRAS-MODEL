@@ -1,11 +1,12 @@
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db_session
+from app.models.manga import Page
 from app.models.vision import CharacterDetected, Panel, SoundEffect, VisionJob
 from app.schemas.vision import CharacterDetectedSchema, PageVisionResult, PanelSchema, SoundEffectSchema
 
@@ -19,6 +20,12 @@ class VisionProcessRequest(BaseModel):
 @router.post("/process", status_code=202)
 async def process_vision(req: VisionProcessRequest, session: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
     """Starts a vision job for a specific page."""
+    # Validate that the page exists
+    page_stmt = select(Page.id).where(Page.id == req.page_id)
+    page_result = await session.execute(page_stmt)
+    if page_result.scalar_one_or_none() is None:
+        raise HTTPException(status_code=404, detail=f"Page {req.page_id} not found")
+
     stmt = insert(VisionJob).values(page_id=req.page_id, status="queued").returning(VisionJob.id)
     result = await session.execute(stmt)
     job_id = result.scalar_one()
