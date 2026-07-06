@@ -3,6 +3,15 @@ from app.models.core import AIProvider, Job, JobLog, Project, Setting, SystemSta
 from app.models.manga import Chapter, DownloadJob, ImportJob, Manga, Page
 
 __all__ = [
+    "ActionDetected",
+    "CharacterDetected",
+    "ConfidenceScore",
+    "Narration",
+    "ObjectDetected",
+    "Panel",
+    "SoundEffect",
+    "SpeechBubble",
+    "VisionJob",
     "Base",
     "Project",
     "Job",
@@ -14,5 +23,16 @@ __all__ = [
     "Chapter",
     "Page",
     "ImportJob",
-    "DownloadJob"
+    "DownloadJob",
 ]
+from app.models.vision import (
+    ActionDetected,
+    CharacterDetected,
+    ConfidenceScore,
+    Narration,
+    ObjectDetected,
+    Panel,
+    SoundEffect,
+    SpeechBubble,
+    VisionJob,
+)

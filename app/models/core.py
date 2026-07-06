@@ -15,6 +15,7 @@ class Project(Base, TimestampMixin):
     status: Mapped[str] = mapped_column(String(50), default="created")
     config: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON)
 
+
 class Job(Base, TimestampMixin):
     __tablename__ = "jobs"
 
@@ -26,6 +27,7 @@ class Job(Base, TimestampMixin):
     result: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON)
     error: Mapped[Optional[str]] = mapped_column(Text)
 
+
 class JobLog(Base, TimestampMixin):
     __tablename__ = "job_logs"
 
@@ -35,6 +37,7 @@ class JobLog(Base, TimestampMixin):
     message: Mapped[str] = mapped_column(Text)
     phase: Mapped[Optional[str]] = mapped_column(String(100))
 
+
 class AIProvider(Base, TimestampMixin):
     __tablename__ = "ai_providers"
 
@@ -43,11 +46,13 @@ class AIProvider(Base, TimestampMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     config: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
 
+
 class Setting(Base, TimestampMixin):
     __tablename__ = "settings"
 
     key: Mapped[str] = mapped_column(String(255), primary_key=True)
     value: Mapped[Dict[str, Any]] = mapped_column(JSON)
+
 
 class SystemState(Base, TimestampMixin):
     __tablename__ = "system_state"

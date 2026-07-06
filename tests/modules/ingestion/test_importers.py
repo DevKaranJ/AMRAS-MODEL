@@ -22,6 +22,7 @@ async def test_folder_importer_success(tmp_path: Path) -> None:
     assert result["imported_chapters"] == 2
     assert result["manga_id"] == 1
 
+
 @pytest.mark.asyncio
 async def test_folder_importer_invalid_source(tmp_path: Path) -> None:
     importer = FolderImporter()
@@ -29,6 +30,7 @@ async def test_folder_importer_invalid_source(tmp_path: Path) -> None:
     file_path.touch()
 
     assert await importer.validate_source(file_path) is False
+
 
 @pytest.mark.asyncio
 async def test_archive_importer_validate_source(tmp_path: Path) -> None:
@@ -46,6 +48,7 @@ async def test_archive_importer_validate_source(tmp_path: Path) -> None:
     txt_path = tmp_path / "dummy.txt"
     txt_path.touch()
     assert await importer.validate_source(txt_path) is False
+
 
 @pytest.mark.asyncio
 async def test_pdf_importer_validate_source(tmp_path: Path) -> None:

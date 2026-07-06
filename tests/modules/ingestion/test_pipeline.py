@@ -26,6 +26,7 @@ async def setup_db() -> AsyncGenerator[None, None]:
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
+
 @pytest.mark.asyncio
 async def test_full_local_import_pipeline(tmp_path: Path, setup_db: None) -> None:
     async with AsyncSession(test_engine) as session:
@@ -44,7 +45,7 @@ async def test_full_local_import_pipeline(tmp_path: Path, setup_db: None) -> Non
             metadata_agent=metadata_agent,
             validation_agent=validation_agent,
             file_system_agent=file_system_agent,
-            database_agent=database_agent
+            database_agent=database_agent,
         )
 
         # Create dummy structure

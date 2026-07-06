@@ -14,7 +14,17 @@ class StorageManager:
     def _ensure_directories(self) -> None:
         """Create necessary subdirectories lazily on first access."""
         if not self._directories_initialized:
-            for subdir in ["manga", "extracted", "ocr", "scripts", "audio", "subtitles", "videos", "thumbnails", "cache"]:
+            for subdir in [
+                "manga",
+                "extracted",
+                "ocr",
+                "scripts",
+                "audio",
+                "subtitles",
+                "videos",
+                "thumbnails",
+                "cache",
+            ]:
                 dir_path = self.base_dir / subdir
                 dir_path.mkdir(parents=True, exist_ok=True)
             self._directories_initialized = True
@@ -57,8 +67,9 @@ class StorageManager:
 
     def ensure_safe_filename(self, filename: str) -> str:
         """Sanitize a filename to be safe for saving."""
-        keepcharacters = (' ','.','_','-')
+        keepcharacters = (" ", ".", "_", "-")
         return "".join(c for c in filename if c.isalnum() or c in keepcharacters).rstrip()
+
 
 # Default storage manager
 storage_manager = StorageManager(settings.storage.base_dir)

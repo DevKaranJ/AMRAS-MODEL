@@ -2,6 +2,11 @@ from app.schemas.job import DownloadJobCreate, DownloadJobRead, ImportJobCreate,
 from app.schemas.manga import ChapterCreate, ChapterRead, MangaCreate, MangaMetadata, MangaRead, PageCreate, PageRead
 
 __all__ = [
+    "CharacterDetectedSchema",
+    "OCRExtractionResult",
+    "PageVisionResult",
+    "PanelSchema",
+    "SoundEffectSchema",
     "MangaCreate",
     "MangaRead",
     "ChapterCreate",
@@ -14,3 +19,10 @@ __all__ = [
     "DownloadJobCreate",
     "DownloadJobRead",
 ]
+from app.schemas.vision import (
+    CharacterDetectedSchema,
+    OCRExtractionResult,
+    PageVisionResult,
+    PanelSchema,
+    SoundEffectSchema,
+)

@@ -10,13 +10,14 @@ from modules.ingestion.agents.validation_agent import ValidationAgent
 
 logger = get_logger("amras.ingestion.collection_agent")
 
+
 class CollectionAgent(BaseIngestionAgent):
     def __init__(
         self,
         metadata_agent: MetadataAgent,
         validation_agent: ValidationAgent,
         file_system_agent: FileSystemAgent,
-        database_agent: DatabaseAgent
+        database_agent: DatabaseAgent,
     ):
         self.metadata_agent = metadata_agent
         self.validation_agent = validation_agent

@@ -13,6 +13,7 @@ def test_storage_manager_initialization(tmp_path: Path) -> None:
     assert (tmp_path / "manga").exists()
     assert (tmp_path / "videos").exists()
 
+
 def test_save_and_read_file(tmp_path: Path) -> None:
     manager = StorageManager(tmp_path)
 
@@ -26,6 +27,7 @@ def test_save_and_read_file(tmp_path: Path) -> None:
     content = manager.read_file(file_path)
     assert content == b"Hello AMRAS"
 
+
 def test_delete_file(tmp_path: Path) -> None:
     manager = StorageManager(tmp_path)
     file_path = tmp_path / "test2.txt"
@@ -34,6 +36,7 @@ def test_delete_file(tmp_path: Path) -> None:
 
     manager.delete_file(file_path)
     assert not file_path.exists()
+
 
 def test_path_traversal_protection(tmp_path: Path) -> None:
     manager = StorageManager(tmp_path)
@@ -45,6 +48,7 @@ def test_path_traversal_protection(tmp_path: Path) -> None:
         manager.save_file(outside_path, "Malicious content")
 
     assert "Path traversal detected" in str(exc_info.value)
+
 
 def test_ensure_safe_filename(tmp_path: Path) -> None:
     manager = StorageManager(tmp_path)

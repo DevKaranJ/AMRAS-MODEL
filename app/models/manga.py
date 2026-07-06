@@ -71,5 +71,5 @@ class DownloadJob(Base, TimestampMixin):
     status: Mapped[str] = mapped_column(String(50), index=True, default="queued")
     progress: Mapped[float] = mapped_column(Float, default=0.0)
     retries: Mapped[int] = mapped_column(Integer, default=0)
-    bandwidth: Mapped[Optional[float]] = mapped_column(Float) # kbps or bytes/s
+    bandwidth: Mapped[Optional[float]] = mapped_column(Float)  # kbps or bytes/s
     error: Mapped[Optional[str]] = mapped_column(Text)

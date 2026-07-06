@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends
@@ -14,19 +13,22 @@ from modules.ingestion.agents.database_agent import DatabaseAgent
 from modules.ingestion.agents.file_system_agent import FileSystemAgent
 from modules.ingestion.agents.metadata_agent import MetadataAgent
 from modules.ingestion.agents.validation_agent import ValidationAgent
-from modules.ingestion.jobs.import_job import ProcessImportJob
-from modules.ingestion.jobs.download_job import ProcessDownloadJob
 from modules.ingestion.importers.remote_importer import RemoteProvider
+from modules.ingestion.jobs.download_job import ProcessDownloadJob
+from modules.ingestion.jobs.import_job import ProcessImportJob
 
 router = APIRouter()
 
+
 class ImportRequest(BaseModel):
     source_path: str
+
 
 class DownloadRequest(BaseModel):
     manga_id: str
     chapter_id: str
     dest_dir: str
+
 
 @router.post("/import", status_code=202)
 async def import_manga(req: ImportRequest, session: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
@@ -47,7 +49,7 @@ async def import_manga(req: ImportRequest, session: AsyncSession = Depends(get_d
         metadata_agent=metadata_agent,
         validation_agent=validation_agent,
         file_system_agent=file_system_agent,
-        database_agent=database_agent
+        database_agent=database_agent,
     )
 
     # Execute job asynchronously (in production, this would be enqueued to a background worker)
@@ -60,6 +62,7 @@ async def import_manga(req: ImportRequest, session: AsyncSession = Depends(get_d
         pass  # Error already logged and persisted by the job
 
     return {"message": "Import job queued", "source_path": req.source_path, "job_id": job_id}
+
 
 @router.post("/download", status_code=202)
 async def download_manga(req: DownloadRequest, session: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
@@ -83,6 +86,7 @@ async def download_manga(req: DownloadRequest, session: AsyncSession = Depends(g
         pass  # Error already logged by the job
 
     return {"message": "Download job queued", "manga_id": req.manga_id, "chapter_id": req.chapter_id, "job_id": job_id}
+
 
 @router.get("/manga")
 async def list_manga(session: AsyncSession = Depends(get_db_session)) -> List[Dict[str, Any]]:

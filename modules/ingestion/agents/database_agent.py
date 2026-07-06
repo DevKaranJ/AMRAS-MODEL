@@ -11,8 +11,8 @@ from modules.ingestion.agents.base import BaseIngestionAgent
 
 logger = get_logger("amras.ingestion.database_agent")
 
-class DatabaseAgent(BaseIngestionAgent):
 
+class DatabaseAgent(BaseIngestionAgent):
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -31,7 +31,7 @@ class DatabaseAgent(BaseIngestionAgent):
                 author=metadata.author,
                 artist=metadata.artist,
                 status=metadata.status,
-                hash=metadata.hash
+                hash=metadata.hash,
             )
             self.session.add(manga)
             try:
@@ -48,7 +48,9 @@ class DatabaseAgent(BaseIngestionAgent):
 
         return manga.id
 
-    async def update_import_job(self, job_id: int, status: str, progress: Optional[float] = None, error: Optional[str] = None) -> None:
+    async def update_import_job(
+        self, job_id: int, status: str, progress: Optional[float] = None, error: Optional[str] = None
+    ) -> None:
         """Updates the status and progress of an import job."""
         stmt = update(ImportJob).where(ImportJob.id == job_id).values(status=status)
         if progress is not None:

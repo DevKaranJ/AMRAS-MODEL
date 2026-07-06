@@ -20,6 +20,7 @@ async def test_metadata_extraction(tmp_path: Path) -> None:
     assert metadata.slug == "one-piece"
     assert metadata.status == "ongoing"
 
+
 @pytest.mark.asyncio
 async def test_validation_agent(tmp_path: Path) -> None:
     agent = ValidationAgent()
@@ -30,6 +31,7 @@ async def test_validation_agent(tmp_path: Path) -> None:
     # Test valid chapter and manga (mocked to true for now)
     assert await agent.validate_chapter(1) is True
     assert await agent.validate_manga(1) is True
+
 
 @pytest.mark.asyncio
 async def test_duplicate_hash_detection(tmp_path: Path) -> None:
