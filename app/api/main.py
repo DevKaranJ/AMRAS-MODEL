@@ -8,6 +8,7 @@ from app.api.endpoints.memory import router as memory_router
 from app.api.endpoints.ocr import router as ocr_router
 from app.api.endpoints.story import router as story_router
 from app.api.endpoints.vision import router as vision_router
+from app.api.endpoints.voice import router as voice_router
 from app.config.settings import settings
 from app.core.exceptions import AmrasException
 from app.core.logger import get_logger, setup_logging
@@ -27,6 +28,7 @@ app.include_router(memory_router, prefix="/memory", tags=["memory"])
 
 app.include_router(ocr_router, prefix="/ocr", tags=["ocr"])
 app.include_router(story_router, prefix="/story", tags=["story"])
+app.include_router(voice_router, prefix="/audio", tags=["voice"])
 
 
 @app.exception_handler(AmrasException)

@@ -28,6 +28,15 @@ from app.models.vision import (
     SpeechBubble,
     VisionJob,
 )
+from app.models.voice import (
+    AudioJob,
+    AudioQualityReport,
+    AudioSegment,
+    AudioVersion,
+    PronunciationDictionary,
+    TimestampIndex,
+    VoiceProfile,
+)
 
 __all__ = [
     "ActionDetected",
@@ -65,4 +74,11 @@ __all__ = [
     "MemoryAudit",
     "ConflictReport",
     "RetrievalIndex",
+    "VoiceProfile",
+    "AudioJob",
+    "AudioSegment",
+    "PronunciationDictionary",
+    "TimestampIndex",
+    "AudioVersion",
+    "AudioQualityReport",
 ]
