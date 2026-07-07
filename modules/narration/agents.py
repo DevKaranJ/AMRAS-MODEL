@@ -66,6 +66,8 @@ class ScriptPlannerAgent(BaseAgent):
 
         try:
             result = json.loads(result_str)
+            if not isinstance(result, dict):
+                return {"status": "planned", "scenes": [{"id": 1, "description": "Fallback Scene", "pacing": "Normal"}]}
             result["status"] = "planned"
             if "scenes" not in result:
                 result["scenes"] = [{"id": 1, "description": "Intro", "pacing": "Normal"}]
@@ -110,7 +112,7 @@ class ContextAgent(BaseAgent):
         return ret
 
     async def validate(self, payload: Dict[str, Any]) -> bool:
-        return "manga_id" in payload or "scene_config" in payload
+        return "manga_id" in payload and isinstance(payload.get("manga_id"), int) and payload["manga_id"] > 0
 
     async def health_check(self) -> bool:
         return True
@@ -179,9 +181,10 @@ class ConsistencyAgent(BaseAgent):
             raise ConsistencyError("Invalid payload for ConsistencyAgent")
 
         text = payload["text"]
+        context = payload["context"]
 
         # Simple LLM call to verify consistency
-        prompt = f"Verify this text for consistency against context: {text}"
+        prompt = f"Verify this text for consistency against context:\n\nText: {text}\n\nContext: {json.dumps(context)}"
         await ai_provider_manager.generate_text(prompt=prompt)
 
         return {"status": "verified", "issues": []}

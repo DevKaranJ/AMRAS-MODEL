@@ -14,34 +14,41 @@ class NarrationException(AmrasException):
 
 class ScriptPlanningError(NarrationException):
     def __init__(self, message: str, **kwargs: Any):
-        super().__init__(message, error_code="SCRIPT_PLANNING_ERROR", **kwargs)
+        kwargs.setdefault("error_code", "SCRIPT_PLANNING_ERROR")
+        super().__init__(message, **kwargs)
 
 
 class StoryNarrationError(NarrationException):
     def __init__(self, message: str, **kwargs: Any):
-        super().__init__(message, error_code="STORY_NARRATION_ERROR", **kwargs)
+        kwargs.setdefault("error_code", "STORY_NARRATION_ERROR")
+        super().__init__(message, **kwargs)
 
 
 class FactCheckError(NarrationException):
     def __init__(self, message: str, **kwargs: Any):
-        super().__init__(message, error_code="FACT_CHECK_ERROR", **kwargs)
+        kwargs.setdefault("error_code", "FACT_CHECK_ERROR")
+        super().__init__(message, **kwargs)
 
 
 class ContextRetrievalError(NarrationException):
     def __init__(self, message: str, **kwargs: Any):
-        super().__init__(message, error_code="CONTEXT_RETRIEVAL_ERROR", **kwargs)
+        kwargs.setdefault("error_code", "CONTEXT_RETRIEVAL_ERROR")
+        super().__init__(message, **kwargs)
 
 
 class StyleGenerationError(NarrationException):
     def __init__(self, message: str, **kwargs: Any):
-        super().__init__(message, error_code="STYLE_GENERATION_ERROR", **kwargs)
+        kwargs.setdefault("error_code", "STYLE_GENERATION_ERROR")
+        super().__init__(message, **kwargs)
 
 
 class ConsistencyError(NarrationException):
     def __init__(self, message: str, **kwargs: Any):
-        super().__init__(message, error_code="CONSISTENCY_ERROR", **kwargs)
+        kwargs.setdefault("error_code", "CONSISTENCY_ERROR")
+        super().__init__(message, **kwargs)
 
 
 class QAError(NarrationException):
     def __init__(self, message: str, **kwargs: Any):
-        super().__init__(message, error_code="QA_ERROR", **kwargs)
+        kwargs.setdefault("error_code", "QA_ERROR")
+        super().__init__(message, **kwargs)

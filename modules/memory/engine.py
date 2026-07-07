@@ -12,7 +12,9 @@ class MemoryEngine:
         Assembles story history, retrieves relevant events, and tracks character relationships.
         This builds a 'Context Package' for the agents.
         """
-        logger.info(f"Retrieving memory context for manga_id={manga_id}, scene={scene_config}")
+        scene_id = scene_config.get("id", "unknown")
+        logger.info(f"Retrieving memory context for manga_id={manga_id}, scene_id={scene_id}")
+        logger.debug(f"Full scene config: {scene_config}")
 
         # In a real implementation, this would:
         # 1. Query `StoryEvent` for the relevant chapter range.

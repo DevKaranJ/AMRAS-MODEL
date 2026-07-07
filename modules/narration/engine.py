@@ -51,9 +51,10 @@ class NarrationEngine:
 
             # 2. Iterate through scenes (Dummy logic for now)
             generated_scenes = []
+            fact_check_failed = False
             for scene_config in plan.get("scenes", []):
                 # Retrieve context
-                context = await self.context_agent.execute({"scene_config": scene_config})
+                context = await self.context_agent.execute({"manga_id": manga_id, "scene_config": scene_config})
 
                 # Narrate
                 narration = await self.narrator.execute({"scene": scene_config, "context": context})
@@ -71,22 +72,30 @@ class NarrationEngine:
                 engaged = await self.engagement.execute({"text": styled.get("text")})
 
                 # Verify facts
-                fact_check = await self.fact_checker.execute({"text": engaged.get("text")})
+                fact_check = await self.fact_checker.execute({"text": engaged.get("text"), "context": context})
                 if not fact_check.get("is_valid"):
                     logger.warning(f"Fact check failed for scene: {fact_check.get('issues')}")
-                    # In a real scenario, we might retry or correct here.
+                    fact_check_failed = True
 
                 generated_scenes.append(engaged.get("text"))
 
             # 3. Final QA
-            # Dummy script ID
-            qa_result = await self.qa_agent.execute({"script_id": 1})
+            # Build assembled script from generated scenes
+            assembled_script = "\n\n".join(generated_scenes)
+            qa_result = await self.qa_agent.execute({"script_id": 1, "script_text": assembled_script})
             if qa_result.get("status") != "approved":
                 logger.warning("QA check did not approve the script.")
+                return {"status": "incomplete", "script": assembled_script, "reason": "QA check failed"}
+
+            if fact_check_failed:
+                logger.warning("Script completed with fact-check warnings.")
+                return {"status": "completed_with_warnings", "script": assembled_script, "warnings": ["Fact check issues detected"]}
 
             logger.info("Script generation completed.")
-            return {"status": "success", "script": "Generated script content..."}
+            return {"status": "success", "script": assembled_script}
 
+        except NarrationException:
+            raise
         except Exception as e:
             logger.error(f"Failed to generate script: {e}")
             raise NarrationException(f"Pipeline execution failed: {e}") from e
