@@ -88,7 +88,7 @@ class MemoryManagerAgent:
                     logger.info("memory_updated_after_conflict", entity_id=entity_id, new_version=memory.version)
                 else:
                     # Should not happen, but handle gracefully
-                    raise RuntimeError(f"Failed to retrieve memory after conflict for entity_id={entity_id}")
+                    raise RuntimeError(f"Failed to retrieve memory after conflict for entity_id={entity_id}") from None
 
         await self.session.commit()
         await self.session.refresh(memory)

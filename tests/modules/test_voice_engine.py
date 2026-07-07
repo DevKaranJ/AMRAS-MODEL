@@ -1,7 +1,10 @@
 import os
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+
 from modules.voice.engine import AudioProductionEngine
+
 
 @pytest.fixture
 def db_session_mock():

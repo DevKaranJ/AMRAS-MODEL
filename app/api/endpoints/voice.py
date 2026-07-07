@@ -40,6 +40,7 @@ async def generate_audio(request: AudioGenerateRequest, engine: AudioProductionE
 @router.post("/regenerate", response_model=Dict[str, Any])
 async def regenerate_audio(request: AudioRegenerateRequest, db: AsyncSession = Depends(get_db_session)):
     from sqlalchemy import select
+
     from app.models.voice import AudioSegment
 
     # Fetch segments to regenerate
@@ -65,10 +66,11 @@ async def regenerate_audio(request: AudioRegenerateRequest, db: AsyncSession = D
 
 @router.post("/normalize", response_model=Dict[str, Any])
 async def normalize_audio(request: AudioNormalizeRequest, db: AsyncSession = Depends(get_db_session)):
+
     from sqlalchemy import select
+
     from app.models.voice import AudioJob, AudioVersion
     from modules.voice.agents import AudioCleanupAgent
-    import os
 
     # Fetch the job
     stmt = select(AudioJob).where(AudioJob.id == request.job_id)
@@ -116,6 +118,7 @@ async def normalize_audio(request: AudioNormalizeRequest, db: AsyncSession = Dep
 @router.get("", response_model=List[AudioJobResponse])
 async def get_audio_jobs(db: AsyncSession = Depends(get_db_session)):
     from sqlalchemy import select
+
     from app.models.voice import AudioJob
 
     stmt = select(AudioJob).order_by(AudioJob.created_at.desc())
@@ -128,6 +131,7 @@ async def get_audio_jobs(db: AsyncSession = Depends(get_db_session)):
 @router.get("/status", response_model=Dict[str, Any])
 async def get_audio_status(job_id: int, db: AsyncSession = Depends(get_db_session)):
     from sqlalchemy import select
+
     from app.models.voice import AudioJob
 
     stmt = select(AudioJob).where(AudioJob.id == job_id)
@@ -150,7 +154,8 @@ async def get_audio_status(job_id: int, db: AsyncSession = Depends(get_db_sessio
 @router.get("/timestamps", response_model=List[TimestampIndexResponse])
 async def get_audio_timestamps(job_id: int, db: AsyncSession = Depends(get_db_session)):
     from sqlalchemy import select
-    from app.models.voice import TimestampIndex, AudioSegment
+
+    from app.models.voice import AudioSegment, TimestampIndex
 
     # Get all segments for this job
     seg_stmt = select(AudioSegment).where(AudioSegment.job_id == job_id)
@@ -173,6 +178,7 @@ async def get_audio_timestamps(job_id: int, db: AsyncSession = Depends(get_db_se
 @router.get("/voices", response_model=List[VoiceProfileResponse])
 async def get_voices(db: AsyncSession = Depends(get_db_session)):
     from sqlalchemy import select
+
     from app.models.voice import VoiceProfile
 
     stmt = select(VoiceProfile).order_by(VoiceProfile.name)
