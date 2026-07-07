@@ -64,17 +64,16 @@ class AudioProductionEngine:
         await self.db.commit()
         await self.db.refresh(job)
 
-        project_dir = os.path.join(self.storage_base_path, f"proj_{project_id}")
-        os.makedirs(project_dir, exist_ok=True)
-        part_dir = os.path.join(project_dir, "part01")
-        os.makedirs(part_dir, exist_ok=True)
-
-        generated_files = []
-
-        pronunciation_dict = await self._get_pronunciation_dict(project_id)
-        self.pronunciation_agent = PronunciationAgent(pronunciation_dict)
-
         try:
+            project_dir = os.path.join(self.storage_base_path, f"proj_{project_id}")
+            os.makedirs(project_dir, exist_ok=True)
+            part_dir = os.path.join(project_dir, "part01")
+            os.makedirs(part_dir, exist_ok=True)
+
+            generated_files = []
+
+            pronunciation_dict = await self._get_pronunciation_dict(project_id)
+            self.pronunciation_agent = PronunciationAgent(pronunciation_dict)
             for idx, segment_data in enumerate(segments):
                 job.current_segment = idx + 1
                 await self.db.commit()
@@ -102,7 +101,12 @@ class AudioProductionEngine:
                 gen_time = time.time() - gen_start
                 logger.info("segment_generated", segment_idx=idx, emotion=emotion, rate=speech_rate, gen_time=gen_time)
 
-                scene_id = segment_data.get("scene_id", f"scene_{idx:03d}")
+                # Sanitize scene_id to prevent path traversal
+                scene_id_raw = segment_data.get("scene_id", f"scene_{idx:03d}")
+                # Allow only alphanumeric, dash, and underscore characters
+                scene_id = "".join(c for c in scene_id_raw if c.isalnum() or c in "-_")
+                if not scene_id:  # If sanitization removed everything, use default
+                    scene_id = f"scene_{idx:03d}"
                 file_path = os.path.join(part_dir, f"{scene_id}.wav")
 
                 with open(file_path, "wb") as f:
@@ -126,16 +130,28 @@ class AudioProductionEngine:
                 generated_files.append(file_path)
 
             if not generated_files:
+                # No audio generated, but complete the job properly
                 master_path = os.path.join(part_dir, "master_normalized.wav")
                 with open(master_path, "wb") as f:
                     f.write(b"empty")
+
+                # Create AudioVersion record for the empty file
+                version = AudioVersion(
+                    job_id=job.id, version_number=1, file_path=master_path, format="wav", type="master"
+                )
+                job.status = "completed"
+                job.progress = 100.0
+                self.db.add(version)
+                await self.db.commit()
+
+                logger.info("audio_generation_completed_empty", job_id=job.id)
                 return master_path
 
             # 5. Stitching
             master_path = os.path.join(part_dir, "master.wav")
             success = self.stitching_agent.merge_audio(generated_files, master_path)
             if not success:
-                pass  # ignore missing file
+                raise AudioStitchingError("Failed to merge audio files into master.wav")
 
             # 6. Normalization
             normalized_path = os.path.join(part_dir, "master_normalized.wav")

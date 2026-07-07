@@ -39,10 +39,8 @@ class EmotionAgent:
         logger.info("emotion_agent_initialized")
 
     async def determine_emotion(self, text: str, context: Optional[str] = None) -> str:
-        prompt = f"Analyze the emotion of this text. Options: Angry, Happy, Excited, Suspense, Neutral.\n\nText: {text}"
-        await self.provider_manager.generate_text(prompt=prompt)
-
-        # Super simple mock parsing logic to act on the mock provider's generic text response
+        # Use local keyword-based logic for emotion determination
+        # Future enhancement: parse AI provider response for more accurate emotion detection
         text_lower = text.lower()
         if "die" in text_lower or "kill" in text_lower:
             return "Angry"
