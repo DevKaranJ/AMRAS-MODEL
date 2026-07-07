@@ -18,6 +18,16 @@ class AIProviderInterface(ABC):
     ) -> str:
         pass
 
+    @abstractmethod
+    async def generate_speech(
+        self,
+        text: str,
+        voice_id: str,
+        model: Optional[str] = None,
+        speed: float = 1.0,
+    ) -> bytes:
+        pass
+
 
 class AIProviderManager:
     """Manages AI providers and routes requests."""
@@ -43,6 +53,14 @@ class AIProviderManager:
             res: str = await asyncio.wait_for(provider.generate_text(*args, **kwargs), timeout=30.0)
         except asyncio.TimeoutError as err:
             raise TimeoutError(f"Provider {provider_name} timed out after 30 seconds") from err
+        return res
+
+    async def generate_speech(self, *args: Any, provider_name: Optional[str] = None, **kwargs: Any) -> bytes:
+        provider = self.get_provider(provider_name)
+        try:
+            res: bytes = await asyncio.wait_for(provider.generate_speech(*args, **kwargs), timeout=300.0)
+        except asyncio.TimeoutError as err:
+            raise TimeoutError(f"Provider {provider_name} timed out after 300 seconds") from err
         return res
 
 
@@ -99,6 +117,36 @@ class MockAIProvider(AIProviderInterface):
                     mock_resp[k] = "mocked_" + k
             return json.dumps(mock_resp)
         return "This is a mock AI response to: " + prompt[:20]
+
+    async def generate_speech(
+        self,
+        text: str,
+        voice_id: str,
+        model: Optional[str] = None,
+        speed: float = 1.0,
+    ) -> bytes:
+        import struct
+
+        payload = b"mock_audio_for: " + text.encode("utf-8")
+        data_size = len(payload)
+        file_size = 36 + data_size
+        header = struct.pack(
+            "<4sI4s4sIHHIIHH4sI",
+            b"RIFF",
+            file_size,
+            b"WAVE",
+            b"fmt ",
+            16,
+            1,
+            1,
+            44100,
+            88200,
+            2,
+            16,
+            b"data",
+            data_size,
+        )
+        return header + payload
 
 
 ai_provider_manager.register_provider("mock", MockAIProvider(), is_default=True)
