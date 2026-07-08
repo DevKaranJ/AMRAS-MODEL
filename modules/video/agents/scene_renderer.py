@@ -27,7 +27,7 @@ class SceneRendererAgent:
     async def execute(self, input_data: SceneRendererInput) -> SceneRendererOutput:
         # Mock implementation
         if not input_data.scene_id:
-            raise SceneRenderError(scene_id=0, reason="Invalid scene ID")
+            raise SceneRenderError(scene_id=input_data.scene_id, reason="Invalid scene ID")
 
         return SceneRendererOutput(
             scene_id=input_data.scene_id,

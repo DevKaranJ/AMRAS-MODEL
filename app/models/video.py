@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional
 
 from sqlalchemy import JSON, Boolean, Float, ForeignKey, Integer, String, Text
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin
@@ -19,7 +20,7 @@ class EncodingProfile(Base, TimestampMixin):
     video_bitrate: Mapped[str] = mapped_column(String(50))
     audio_bitrate: Mapped[str] = mapped_column(String(50))
     is_default: Mapped[bool] = mapped_column(Boolean, default=False)
-    config: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
+    config: Mapped[Dict[str, Any]] = mapped_column(MutableDict.as_mutable(JSON), default=dict)
 
 class RenderJob(Base, TimestampMixin):
     __tablename__ = "render_jobs"
@@ -31,7 +32,7 @@ class RenderJob(Base, TimestampMixin):
     status: Mapped[str] = mapped_column(String(50), default="queued", index=True)
     progress: Mapped[float] = mapped_column(Float, default=0.0)
     error_message: Mapped[Optional[str]] = mapped_column(Text)
-    config: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
+    config: Mapped[Dict[str, Any]] = mapped_column(MutableDict.as_mutable(JSON), default=dict)
 
 class RenderScene(Base, TimestampMixin):
     __tablename__ = "render_scenes"
@@ -54,7 +55,7 @@ class EncodedVideo(Base, TimestampMixin):
     size_bytes: Mapped[int] = mapped_column(Integer)
     duration_ms: Mapped[int] = mapped_column(Integer)
     checksum: Mapped[Optional[str]] = mapped_column(String(255))
-    metadata_info: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
+    metadata_info: Mapped[Dict[str, Any]] = mapped_column(MutableDict.as_mutable(JSON), default=dict)
 
 class RenderReport(Base, TimestampMixin):
     __tablename__ = "render_reports"
@@ -66,8 +67,8 @@ class RenderReport(Base, TimestampMixin):
     peak_ram_mb: Mapped[float] = mapped_column(Float, default=0.0)
     peak_gpu_mb: Mapped[float] = mapped_column(Float, default=0.0)
     dropped_frames: Mapped[int] = mapped_column(Integer, default=0)
-    warnings: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
-    errors: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
+    warnings: Mapped[Dict[str, Any]] = mapped_column(MutableDict.as_mutable(JSON), default=dict)
+    errors: Mapped[Dict[str, Any]] = mapped_column(MutableDict.as_mutable(JSON), default=dict)
 
 class OutputFile(Base, TimestampMixin):
     __tablename__ = "output_files"

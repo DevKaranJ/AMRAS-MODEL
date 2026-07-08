@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, List
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,6 +7,7 @@ from app.database.session import get_db_session
 from app.schemas.video import (
     RenderCancelRequest,
     RenderJobResponse,
+    RenderOutputResponse,
     RenderReportResponse,
     RenderResumeRequest,
     RenderStartRequest,
@@ -130,7 +131,7 @@ async def get_render_report(
 
 @router.get(
     "/output/{job_id}",
-    response_model=Dict[str, Any],
+    response_model=RenderOutputResponse,
     summary="Get render output files",
     description="Retrieves paths to the generated output videos for a job.",
 )

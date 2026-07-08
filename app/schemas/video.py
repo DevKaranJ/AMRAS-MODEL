@@ -146,3 +146,8 @@ class RenderStatusResponse(BaseModel):
     status: str
     progress: float
     message: Optional[str] = None
+
+class RenderOutputResponse(BaseModel):
+    job_id: int
+    master_video: Optional[str] = None
+    preview_video: Optional[str] = None

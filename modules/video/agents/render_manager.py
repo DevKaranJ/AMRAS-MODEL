@@ -2,7 +2,7 @@ from typing import Any, Dict
 
 from pydantic import BaseModel, Field
 
-from modules.video.exceptions import RenderJobNotFound
+from modules.video.exceptions import InvalidRenderActionError
 
 
 class RenderManagerInput(BaseModel):
@@ -55,4 +55,4 @@ class RenderManagerAgent:
                 message="Rendering in progress."
             )
         else:
-            raise RenderJobNotFound(job_id=input_data.job_id)
+            raise InvalidRenderActionError(action=input_data.action)
