@@ -17,6 +17,15 @@ from app.models.memory import (
     RetrievalIndex,
     WorldMemory,
 )
+from app.models.video import (
+    EncodedVideo,
+    EncodingProfile,
+    OutputFile,
+    RenderJob,
+    RenderReport,
+    RenderScene,
+    RenderStatistic,
+)
 from app.models.vision import (
     ActionDetected,
     CharacterDetected,
@@ -81,4 +90,11 @@ __all__ = [
     "TimestampIndex",
     "AudioVersion",
     "AudioQualityReport",
+    "EncodedVideo",
+    "EncodingProfile",
+    "OutputFile",
+    "RenderJob",
+    "RenderReport",
+    "RenderScene",
+    "RenderStatistic",
 ]

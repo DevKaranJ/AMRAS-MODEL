@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.models.timeline import Timeline, TimelineScene, TimelinePanel, CameraPath
+from app.models.timeline import CameraPath, Timeline, TimelinePanel, TimelineScene
 from app.schemas.timeline import TimelineGenerateRequest, TimelineRebuildRequest
 from modules.timeline.agents import (
     AudioSynchronizationAgent,
