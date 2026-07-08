@@ -21,7 +21,7 @@ class AnimationProfileResponse(AnimationProfileBase):
 
 class TransitionBase(BaseModel):
     type: str = Field(..., max_length=100)
-    duration_ms: int = 0
+    duration_ms: int = Field(default=0, ge=0)
     config: Dict[str, Any] = Field(default_factory=dict)
 
 class TransitionCreate(TransitionBase):
@@ -41,7 +41,7 @@ class CameraPathBase(BaseModel):
     start_y: float = 0.0
     end_x: float = 0.0
     end_y: float = 0.0
-    duration_ms: int
+    duration_ms: int = Field(..., ge=0)
     config: Dict[str, Any] = Field(default_factory=dict)
 
 class CameraPathCreate(CameraPathBase):
@@ -55,9 +55,9 @@ class CameraPathResponse(CameraPathBase):
 
 class SceneMetadataBase(BaseModel):
     emotion: Optional[str] = Field(None, max_length=100)
-    intensity: float = 0.0
-    visual_complexity: float = 0.0
-    dialogue_density: float = 0.0
+    intensity: float = Field(default=0.0, ge=0.0, le=1.0)
+    visual_complexity: float = Field(default=0.0, ge=0.0, le=1.0)
+    dialogue_density: float = Field(default=0.0, ge=0.0, le=1.0)
     is_battle: bool = False
     is_flashback: bool = False
     config: Dict[str, Any] = Field(default_factory=dict)
@@ -75,10 +75,10 @@ class TimelinePanelBase(BaseModel):
     scene_id: int
     panel_id: Optional[int] = None
     sequence_number: int
-    start_time_ms: int
-    end_time_ms: int
-    duration_ms: int
-    importance_score: float = 0.0
+    start_time_ms: int = Field(..., ge=0)
+    end_time_ms: int = Field(..., ge=0)
+    duration_ms: int = Field(..., ge=0)
+    importance_score: float = Field(default=0.0, ge=0.0, le=1.0)
     camera_path_id: Optional[int] = None
 
 class TimelinePanelCreate(TimelinePanelBase):
@@ -94,9 +94,9 @@ class SynchronizationBase(BaseModel):
     scene_id: int
     audio_segment_id: Optional[int] = None
     narration_id: Optional[int] = None
-    start_time_ms: int
-    end_time_ms: int
-    sync_accuracy: float = 1.0
+    start_time_ms: int = Field(..., ge=0)
+    end_time_ms: int = Field(..., ge=0)
+    sync_accuracy: float = Field(default=1.0, ge=0.0, le=1.0)
 
 class SynchronizationCreate(SynchronizationBase):
     pass
@@ -110,9 +110,9 @@ class SynchronizationResponse(SynchronizationBase):
 class TimelineSceneBase(BaseModel):
     timeline_id: int
     sequence_number: int
-    start_time_ms: int
-    end_time_ms: int
-    duration_ms: int
+    start_time_ms: int = Field(..., ge=0)
+    end_time_ms: int = Field(..., ge=0)
+    duration_ms: int = Field(..., ge=0)
     page_id: Optional[int] = None
     transition_id: Optional[int] = None
     metadata_id: Optional[int] = None
@@ -131,7 +131,7 @@ class TimelineSceneResponse(TimelineSceneBase):
 class TimelineBase(BaseModel):
     project_id: int
     status: str = Field(default="draft", max_length=50)
-    duration_ms: int = 0
+    duration_ms: int = Field(default=0, ge=0)
     settings: Dict[str, Any] = Field(default_factory=dict)
 
 class TimelineCreate(TimelineBase):

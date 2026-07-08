@@ -15,7 +15,7 @@ class TimelinePlanningAgent:
             settings=settings
         )
 
-    def plan_scenes(self, pages: List[Dict[str, Any]], narrations: List[Dict[str, Any]]) -> List[TimelineSceneCreate]:
+    def plan_scenes(self, timeline_id: int, pages: List[Dict[str, Any]], narrations: List[Dict[str, Any]]) -> List[TimelineSceneCreate]:
         scenes = []
         current_time_ms = 0
         sequence_number = 1
@@ -24,7 +24,7 @@ class TimelinePlanningAgent:
             duration_ms = self._estimate_duration(page, narrations)
 
             scene = TimelineSceneCreate(
-                timeline_id=0,
+                timeline_id=timeline_id,
                 sequence_number=sequence_number,
                 start_time_ms=current_time_ms,
                 end_time_ms=current_time_ms + duration_ms,

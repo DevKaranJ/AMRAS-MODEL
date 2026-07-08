@@ -26,7 +26,9 @@ async def rebuild_timeline(
     request: TimelineRebuildRequest,
     db: AsyncSession = Depends(get_db_session)
 ) -> Dict[str, Any]:
-    return {"status": "rebuilding", "timeline_id": request.timeline_id}
+    service = TimelineService(db)
+    result = await service.rebuild_timeline(request)
+    return result
 
 @router.get("", response_model=Dict[str, Any])
 async def get_timeline(
@@ -44,25 +46,29 @@ async def get_timeline_scenes(
     timeline_id: int,
     db: AsyncSession = Depends(get_db_session)
 ) -> List[Dict[str, Any]]:
-    return [{"id": 1, "timeline_id": timeline_id}]
+    service = TimelineService(db)
+    return await service.get_timeline_scenes(timeline_id)
 
 @router.get("/camera", response_model=List[Dict[str, Any]])
 async def get_timeline_cameras(
     scene_id: int,
     db: AsyncSession = Depends(get_db_session)
 ) -> List[Dict[str, Any]]:
-    return [{"id": 1, "type": "zoom"}]
+    service = TimelineService(db)
+    return await service.get_timeline_cameras(scene_id)
 
 @router.get("/transitions", response_model=List[Dict[str, Any]])
 async def get_timeline_transitions(
     timeline_id: int,
     db: AsyncSession = Depends(get_db_session)
 ) -> List[Dict[str, Any]]:
-    return [{"id": 1, "type": "fade"}]
+    service = TimelineService(db)
+    return await service.get_timeline_transitions(timeline_id)
 
 @router.get("/status", response_model=Dict[str, Any])
 async def get_timeline_status(
     project_id: int,
     db: AsyncSession = Depends(get_db_session)
 ) -> Dict[str, Any]:
-    return {"project_id": project_id, "status": "completed"}
+    service = TimelineService(db)
+    return await service.get_timeline_status(project_id)
