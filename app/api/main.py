@@ -7,6 +7,7 @@ from app.api.endpoints.ingestion import router as ingestion_router
 from app.api.endpoints.memory import router as memory_router
 from app.api.endpoints.ocr import router as ocr_router
 from app.api.endpoints.story import router as story_router
+from app.api.endpoints.timeline import router as timeline_router
 from app.api.endpoints.vision import router as vision_router
 from app.api.endpoints.voice import router as voice_router
 from app.config.settings import settings
@@ -29,6 +30,7 @@ app.include_router(memory_router, prefix="/memory", tags=["memory"])
 app.include_router(ocr_router, prefix="/ocr", tags=["ocr"])
 app.include_router(story_router, prefix="/story", tags=["story"])
 app.include_router(voice_router, prefix="/audio", tags=["voice"])
+app.include_router(timeline_router, prefix="/timeline", tags=["timeline"])
 
 
 @app.exception_handler(AmrasException)
