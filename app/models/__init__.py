@@ -17,6 +17,16 @@ from app.models.memory import (
     RetrievalIndex,
     WorldMemory,
 )
+from app.models.qa import (
+    ApprovalHistory,
+    AutoFixHistory,
+    IssueReport,
+    ManualReview,
+    PerformanceReport,
+    QAReport,
+    QualityScore,
+    ValidationMetric,
+)
 from app.models.subtitles import (
     CaptionStyle,
     LocalizationProfile,
@@ -64,6 +74,20 @@ from app.models.voice import (
     PronunciationDictionary,
     TimestampIndex,
     VoiceProfile,
+)
+from app.models.youtube import (
+    AnalyticsProfile,
+    Description,
+    Playlist,
+    PublishedVideo,
+    PublishingJob,
+    Schedule,
+    SEOProfile,
+    Tag,
+    Thumbnail,
+    ThumbnailVariant,
+    Title,
+    VideoMetadata,
 )
 
 __all__ = [
@@ -123,35 +147,32 @@ __all__ = [
     "SubtitleSegment",
     "SubtitleVersion",
     "TranslationJob",
+    "ApprovalHistory",
+    "AutoFixHistory",
+    "IssueReport",
+    "ManualReview",
+    "PerformanceReport",
+    "QAReport",
+    "QualityScore",
+    "ValidationMetric",
+    "AnimationProfile",
+    "CameraPath",
+    "SceneMetadata",
+    "Synchronization",
+    "Timeline",
+    "TimelinePanel",
+    "TimelineScene",
+    "Transition",
+    "PublishingJob",
+    "Thumbnail",
+    "ThumbnailVariant",
+    "SEOProfile",
+    "Title",
+    "Description",
+    "Tag",
+    "VideoMetadata",
+    "Playlist",
+    "Schedule",
+    "PublishedVideo",
+    "AnalyticsProfile",
 ]
-from app.models.youtube import (
-    AnalyticsProfile,
-    Description,
-    Playlist,
-    PublishedVideo,
-    PublishingJob,
-    Schedule,
-    SEOProfile,
-    Tag,
-    Thumbnail,
-    ThumbnailVariant,
-    Title,
-    VideoMetadata,
-)
-
-__all__.extend(
-    [
-        "PublishingJob",
-        "Thumbnail",
-        "ThumbnailVariant",
-        "SEOProfile",
-        "Title",
-        "Description",
-        "Tag",
-        "VideoMetadata",
-        "Playlist",
-        "Schedule",
-        "PublishedVideo",
-        "AnalyticsProfile",
-    ]
-)

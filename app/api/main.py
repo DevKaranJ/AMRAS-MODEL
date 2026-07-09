@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 from app.api.endpoints.ingestion import router as ingestion_router
 from app.api.endpoints.memory import router as memory_router
 from app.api.endpoints.ocr import router as ocr_router
+from app.api.endpoints.qa import router as qa_router
 from app.api.endpoints.story import router as story_router
 from app.api.endpoints.subtitles import router as subtitles_router
 from app.api.endpoints.thumbnails import router as thumbnails_router
@@ -39,6 +40,7 @@ app.include_router(video_router, prefix="/render", tags=["video"])
 app.include_router(subtitles_router, prefix="/subtitles", tags=["subtitles"])
 app.include_router(youtube_router, tags=["youtube", "publishing"])
 app.include_router(thumbnails_router, prefix="/thumbnail", tags=["thumbnails"])
+app.include_router(qa_router, prefix="/qa", tags=["qa"])
 
 
 @app.exception_handler(AmrasException)
@@ -63,17 +65,17 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
 
 
 @app.get("/health", tags=["system"])
-async def health_check() -> Dict[str, Any]:
+async def health_check() -> Any:
     return {"status": "ok"}
 
 
 @app.get("/version", tags=["system"])
-async def version() -> Dict[str, Any]:
+async def version() -> Any:
     return {"version": settings.version}
 
 
 @app.get("/settings", tags=["system"])
-async def get_app_settings() -> Dict[str, Any]:
+async def get_app_settings() -> Any:
     data = settings.model_dump()
     # Redact sensitive values
     if "ai" in data and "api_key" in data["ai"]:
@@ -85,10 +87,10 @@ async def get_app_settings() -> Dict[str, Any]:
 
 # Skeleton jobs endpoints
 @app.post("/jobs", tags=["jobs"])
-async def create_job() -> Dict[str, Any]:
+async def create_job() -> Any:
     return {"status": "queued", "job_id": "123"}
 
 
 @app.get("/jobs/{job_id}", tags=["jobs"])
-async def get_job(job_id: str) -> Dict[str, Any]:
+async def get_job(job_id: str) -> Any:
     return {"job_id": job_id, "status": "running"}
