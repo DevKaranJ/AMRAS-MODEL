@@ -89,6 +89,17 @@ from app.models.youtube import (
     Title,
     VideoMetadata,
 )
+from app.models.production import (
+    ApplicationSettings,
+    BackupHistory,
+    InstalledModels,
+    NotificationHistory,
+    PipelineHistory,
+    ProjectHistory,
+    StorageStatistics,
+    SystemHealth,
+    UserPreferences,
+)
 
 __all__ = [
     "ActionDetected",
@@ -175,4 +186,13 @@ __all__ = [
     "Schedule",
     "PublishedVideo",
     "AnalyticsProfile",
+    "ApplicationSettings",
+    "BackupHistory",
+    "InstalledModels",
+    "NotificationHistory",
+    "PipelineHistory",
+    "ProjectHistory",
+    "StorageStatistics",
+    "SystemHealth",
+    "UserPreferences",
 ]

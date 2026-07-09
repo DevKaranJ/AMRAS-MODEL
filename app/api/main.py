@@ -7,6 +7,7 @@ from app.api.endpoints.ingestion import router as ingestion_router
 from app.api.endpoints.memory import router as memory_router
 from app.api.endpoints.ocr import router as ocr_router
 from app.api.endpoints.qa import router as qa_router
+from app.api.endpoints.production import router as production_router
 from app.api.endpoints.story import router as story_router
 from app.api.endpoints.subtitles import router as subtitles_router
 from app.api.endpoints.thumbnails import router as thumbnails_router
@@ -41,6 +42,7 @@ app.include_router(subtitles_router, prefix="/subtitles", tags=["subtitles"])
 app.include_router(youtube_router, tags=["youtube", "publishing"])
 app.include_router(thumbnails_router, prefix="/thumbnail", tags=["thumbnails"])
 app.include_router(qa_router, prefix="/qa", tags=["qa"])
+app.include_router(production_router, prefix="/production", tags=["production"])
 
 
 @app.exception_handler(AmrasException)

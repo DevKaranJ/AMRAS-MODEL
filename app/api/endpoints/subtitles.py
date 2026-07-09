@@ -1,5 +1,5 @@
-from typing import Any, List
 import logging
+from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
