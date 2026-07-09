@@ -1,17 +1,6 @@
 from app.models.base import Base
-from app.models.timeline import Timeline, TimelineScene, TimelinePanel, SceneMetadata, Synchronization, Transition, AnimationProfile, CameraPath
-
 from app.models.core import AIProvider, Job, JobLog, Project, Setting, SystemState
 from app.models.manga import Chapter, DownloadJob, ImportJob, Manga, Page
-from app.models.subtitles import (
-    CaptionStyle,
-    LocalizationProfile,
-    SubtitleJob,
-    SubtitleLanguage,
-    SubtitleSegment,
-    SubtitleVersion,
-    TranslationJob,
-)
 from app.models.memory import (
     AbilityMemory,
     CharacterMemory,
@@ -27,6 +16,25 @@ from app.models.memory import (
     RelationshipMemory,
     RetrievalIndex,
     WorldMemory,
+)
+from app.models.subtitles import (
+    CaptionStyle,
+    LocalizationProfile,
+    SubtitleJob,
+    SubtitleLanguage,
+    SubtitleSegment,
+    SubtitleVersion,
+    TranslationJob,
+)
+from app.models.timeline import (
+    AnimationProfile,
+    CameraPath,
+    SceneMetadata,
+    Synchronization,
+    Timeline,
+    TimelinePanel,
+    TimelineScene,
+    Transition,
 )
 from app.models.video import (
     EncodedVideo,
@@ -116,3 +124,34 @@ __all__ = [
     "SubtitleVersion",
     "TranslationJob",
 ]
+from app.models.youtube import (
+    AnalyticsProfile,
+    Description,
+    Playlist,
+    PublishedVideo,
+    PublishingJob,
+    Schedule,
+    SEOProfile,
+    Tag,
+    Thumbnail,
+    ThumbnailVariant,
+    Title,
+    VideoMetadata,
+)
+
+__all__.extend(
+    [
+        "PublishingJob",
+        "Thumbnail",
+        "ThumbnailVariant",
+        "SEOProfile",
+        "Title",
+        "Description",
+        "Tag",
+        "VideoMetadata",
+        "Playlist",
+        "Schedule",
+        "PublishedVideo",
+        "AnalyticsProfile",
+    ]
+)
