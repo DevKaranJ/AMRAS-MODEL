@@ -60,7 +60,7 @@ def export_to_vtt(segments: List[SubtitleSegment]) -> str:
 def export_to_ass(segments: List[SubtitleSegment], style: CaptionStyle | None = None) -> str:
     """Exports subtitle segments to ASS format with optional styling."""
     font_name = style.font_family if style else "Arial"
-    font_size = style.font_size if style else 24
+    font_size = style.font_size if style else 42
 
     # basic header
     lines = [

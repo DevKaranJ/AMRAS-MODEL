@@ -1,10 +1,14 @@
 from typing import Any, List
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db_session
+
+logger = logging.getLogger(__name__)
 from app.models.subtitles import (
     CaptionStyle,
     SubtitleJob,
@@ -39,10 +43,16 @@ async def generate_subtitles(
         lang_res = await db.execute(select(SubtitleLanguage).where(SubtitleLanguage.code == request.language_code))
         lang = lang_res.scalar_one_or_none()
         if not lang:
-            # Fallback
             lang = SubtitleLanguage(code=request.language_code, name=request.language_code.upper())
             db.add(lang)
-            await db.flush()
+            try:
+                await db.flush()
+            except IntegrityError:
+                await db.rollback()
+                lang_res = await db.execute(select(SubtitleLanguage).where(SubtitleLanguage.code == request.language_code))
+                lang = lang_res.scalar_one_or_none()
+                if not lang:
+                    raise
 
         engine = SubtitleEngine(db_session=db)
         job = await engine.create_subtitle_job(
@@ -57,7 +67,8 @@ async def generate_subtitles(
 
         return job
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+        logger.exception("Failed to create subtitle generation job")
+        raise HTTPException(status_code=500, detail="Failed to create subtitle job") from e
 
 
 @router.post("/translate", response_model=TranslationJobResponse, status_code=status.HTTP_202_ACCEPTED)
@@ -77,7 +88,16 @@ async def translate_subtitles(
         if not target_lang:
             target_lang = SubtitleLanguage(code=request.target_language_code, name=request.target_language_code.upper())
             db.add(target_lang)
-            await db.flush()
+            try:
+                await db.flush()
+            except IntegrityError:
+                await db.rollback()
+                lang_res = await db.execute(
+                    select(SubtitleLanguage).where(SubtitleLanguage.code == request.target_language_code)
+                )
+                target_lang = lang_res.scalar_one_or_none()
+                if not target_lang:
+                    raise
 
         # Get source job language
         src_job_res = await db.execute(select(SubtitleJob).where(SubtitleJob.id == request.subtitle_job_id))
@@ -97,8 +117,11 @@ async def translate_subtitles(
         await db.refresh(job)
 
         return job
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) from e
+        logger.exception("Failed to create translation job")
+        raise HTTPException(status_code=500, detail="Failed to translate subtitles") from e
 
 
 @router.post("/regenerate", response_model=SubtitleJobResponse, status_code=status.HTTP_202_ACCEPTED)

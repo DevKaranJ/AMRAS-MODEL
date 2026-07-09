@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import async_session_maker
-from app.models.subtitles import SubtitleJob, SubtitleLanguage, SubtitleSegment, TranslationJob
+from app.models.subtitles import LocalizationProfile, SubtitleJob, SubtitleLanguage, SubtitleSegment, TranslationJob
 from modules.subtitles.exceptions import SubtitleEngineError
 
 
@@ -61,7 +61,8 @@ class SubtitleEngine:
         from modules.subtitles.agents import QAAgent, SubtitleGenerationAgent, SynchronizationAgent
 
         db = await self.get_db()
-        job = await self.get_subtitle_job(job_id)
+        result = await db.execute(select(SubtitleJob).where(SubtitleJob.id == job_id))
+        job = result.scalar_one_or_none()
         if not job:
             if not self._db_session:
                 await db.close()
@@ -90,8 +91,14 @@ class SubtitleEngine:
             qa_result = await qa_agent.execute(qa_payload)
 
             if not qa_result.get("passed"):
-                # Handle warnings (log them, etc.), but continue saving
-                pass
+                issues = qa_result.get("issues", [])
+                issues_summary = "; ".join(issues[:5])
+                job.error_message = f"QA failed: {issues_summary}"
+                job.status = "failed"
+                await db.commit()
+                if not self._db_session:
+                    await db.close()
+                return
 
             # Save segments to database
             db_segments = []
@@ -168,10 +175,22 @@ class SubtitleEngine:
 
             # Localization
             if t_job.localization_profile_id:
-                # Load profile details if needed
-                l_payload = {"segments": translated_segs, "profile": {"id": t_job.localization_profile_id}}
-                l_result = await local_agent.execute(l_payload)
-                translated_segs = l_result.get("localized_segments", translated_segs)
+                profile_result = await db.execute(
+                    select(LocalizationProfile).where(LocalizationProfile.id == t_job.localization_profile_id)
+                )
+                profile = profile_result.scalar_one_or_none()
+                if profile:
+                    profile_dict = {
+                        "id": profile.id,
+                        "name": profile.name,
+                        "honorifics_strategy": profile.honorifics_strategy,
+                        "measurements_strategy": profile.measurements_strategy,
+                        "currency_strategy": profile.currency_strategy,
+                        "rules": profile.rules,
+                    }
+                    l_payload = {"segments": translated_segs, "profile": profile_dict}
+                    l_result = await local_agent.execute(l_payload)
+                    translated_segs = l_result.get("localized_segments", translated_segs)
 
             # Formatting
             f_payload = {"segments": translated_segs, "settings": {"max_lines": 2, "max_characters_per_line": 42}}
@@ -179,9 +198,11 @@ class SubtitleEngine:
             final_segs = f_result.get("formatted_segments", translated_segs)
 
             # Create a new SubtitleJob for the translated version to hold the new segments
+            if not t_job.subtitle_job:
+                raise SubtitleEngineError("Translation job has no associated subtitle job")
             new_job = SubtitleJob(
-                project_id=t_job.subtitle_job.project_id if t_job.subtitle_job else 0,
-                timeline_id=t_job.subtitle_job.timeline_id if t_job.subtitle_job else 0,
+                project_id=t_job.subtitle_job.project_id,
+                timeline_id=t_job.subtitle_job.timeline_id,
                 language_id=t_job.target_language_id,
                 status="completed",
                 progress=100.0,

@@ -3,12 +3,12 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import JSON, Boolean, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import Base
+from app.models.base import Base, TimestampMixin
 from app.models.core import Project
 from app.models.timeline import Timeline
 
 
-class SubtitleLanguage(Base):
+class SubtitleLanguage(Base, TimestampMixin):
     __tablename__ = "subtitle_languages"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     code: Mapped[str] = mapped_column(String(10), nullable=False, unique=True)
@@ -22,7 +22,7 @@ class SubtitleLanguage(Base):
     subtitle_jobs: Mapped[List["SubtitleJob"]] = relationship("SubtitleJob", back_populates="language")
 
 
-class LocalizationProfile(Base):
+class LocalizationProfile(Base, TimestampMixin):
     __tablename__ = "localization_profiles"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -39,7 +39,7 @@ class LocalizationProfile(Base):
     )
 
 
-class CaptionStyle(Base):
+class CaptionStyle(Base, TimestampMixin):
     __tablename__ = "caption_styles"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -56,7 +56,7 @@ class CaptionStyle(Base):
     safe_area_padding: Mapped[int] = mapped_column(Integer, default=10)
 
 
-class SubtitleJob(Base):
+class SubtitleJob(Base, TimestampMixin):
     __tablename__ = "subtitle_jobs"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
@@ -81,7 +81,7 @@ class SubtitleJob(Base):
     )
 
 
-class SubtitleSegment(Base):
+class SubtitleSegment(Base, TimestampMixin):
     __tablename__ = "subtitle_segments"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     subtitle_job_id: Mapped[int] = mapped_column(ForeignKey("subtitle_jobs.id", ondelete="CASCADE"), nullable=False)
@@ -98,7 +98,7 @@ class SubtitleSegment(Base):
     subtitle_job: Mapped["SubtitleJob"] = relationship("SubtitleJob", back_populates="segments")
 
 
-class TranslationJob(Base):
+class TranslationJob(Base, TimestampMixin):
     __tablename__ = "translation_jobs"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     subtitle_job_id: Mapped[int] = mapped_column(ForeignKey("subtitle_jobs.id", ondelete="CASCADE"), nullable=False)
@@ -119,7 +119,7 @@ class TranslationJob(Base):
     )
 
 
-class SubtitleVersion(Base):
+class SubtitleVersion(Base, TimestampMixin):
     __tablename__ = "subtitle_versions"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     subtitle_job_id: Mapped[int] = mapped_column(ForeignKey("subtitle_jobs.id", ondelete="CASCADE"), nullable=False)

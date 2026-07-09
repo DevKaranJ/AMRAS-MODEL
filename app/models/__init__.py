@@ -3,6 +3,15 @@ from app.models.timeline import Timeline, TimelineScene, TimelinePanel, SceneMet
 
 from app.models.core import AIProvider, Job, JobLog, Project, Setting, SystemState
 from app.models.manga import Chapter, DownloadJob, ImportJob, Manga, Page
+from app.models.subtitles import (
+    CaptionStyle,
+    LocalizationProfile,
+    SubtitleJob,
+    SubtitleLanguage,
+    SubtitleSegment,
+    SubtitleVersion,
+    TranslationJob,
+)
 from app.models.memory import (
     AbilityMemory,
     CharacterMemory,
@@ -99,4 +108,11 @@ __all__ = [
     "RenderReport",
     "RenderScene",
     "RenderStatistic",
+    "CaptionStyle",
+    "LocalizationProfile",
+    "SubtitleJob",
+    "SubtitleLanguage",
+    "SubtitleSegment",
+    "SubtitleVersion",
+    "TranslationJob",
 ]

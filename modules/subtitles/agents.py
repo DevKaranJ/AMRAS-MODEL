@@ -30,8 +30,9 @@ class SubtitleGenerationAgent(BaseAgent):
             raise SubtitleGenerationError("Invalid payload for SubtitleGenerationAgent", details=payload)
 
         narration = payload.get("narration_script", "")
-        max_lines = payload.get("settings", {}).get("max_lines", 2)
-        max_chars = payload.get("settings", {}).get("max_characters_per_line", 42)
+        settings = payload.get("settings") or {}
+        max_lines = settings.get("max_lines", 2)
+        max_chars = settings.get("max_characters_per_line", 42)
 
         prompt = f"""
         Given the following narration script, segment it into subtitles.
@@ -235,6 +236,9 @@ class LocalizationAgent(BaseAgent):
         return "1.0.0"
 
     async def execute(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+        if not await self.validate(payload):
+            raise TranslationError("Invalid payload for LocalizationAgent", details=payload)
+
         segments = payload.get("segments", [])
         profile = payload.get("profile", {})
 
@@ -294,8 +298,9 @@ class FormattingAgent(BaseAgent):
 
     async def execute(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         segments = payload.get("segments", [])
-        max_lines = payload.get("settings", {}).get("max_lines", 2)
-        max_chars = payload.get("settings", {}).get("max_characters_per_line", 42)
+        settings = payload.get("settings") or {}
+        max_lines = settings.get("max_lines", 2)
+        max_chars = settings.get("max_characters_per_line", 42)
 
         # We can simulate deterministic checks here or use AI to re-flow text
         prompt = f"""
