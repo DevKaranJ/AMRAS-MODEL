@@ -42,13 +42,26 @@ class AIModelManagerAgent:
 
     async def install_local_model(self, model_name: str, source_url: str, db: AsyncSession) -> Dict[str, Any]:
         """Downloads and installs a local AI model."""
-        model = InstalledModels(
-            name=model_name,
-            provider="local",
-            status="installed",
-            path=source_url
-        )
-        db.add(model)
+        # Check if model already exists
+        result = await db.execute(select(InstalledModels).where(InstalledModels.name == model_name))
+        existing_model = result.scalar_one_or_none()
+
+        if existing_model:
+            # Update existing model
+            existing_model.provider = "local"
+            existing_model.status = "installed"
+            existing_model.path = source_url
+            logger.info(f"Updated existing model {model_name} from {source_url}.")
+        else:
+            # Create new model
+            model = InstalledModels(
+                name=model_name,
+                provider="local",
+                status="installed",
+                path=source_url
+            )
+            db.add(model)
+            logger.info(f"Installing model {model_name} from {source_url}.")
+
         await db.commit()
-        logger.info(f"Installing model {model_name} from {source_url}.")
         return {"model": model_name, "status": "installed"}

@@ -45,18 +45,23 @@ async def test_workflow_manager_agent(db_session: AsyncSession) -> None:
     result = await agent.execute_pipeline(job_id, stages, db_session)
     assert result["status"] == "started"
     assert result["stages_scheduled"] == 2
+    assert result["job_id"] == job_id
 
     pause_res = await agent.pause_workflow(job_id, db_session)
     assert pause_res["status"] == "paused"
+    assert pause_res["job_id"] == job_id
 
     cancel_res = await agent.cancel_workflow(job_id, db_session)
     assert cancel_res["status"] == "canceled"
+    assert cancel_res["job_id"] == job_id
 
     resume_res = await agent.resume_workflow(job_id, "story", db_session)
     assert resume_res["status"] == "resumed"
+    assert resume_res["job_id"] == job_id
 
     retry_res = await agent.retry_stage(job_id, "ocr", db_session)
     assert retry_res["status"] == "retrying"
+    assert retry_res["job_id"] == job_id
 
 async def test_queue_manager_agent() -> None:
     agent = QueueManagerAgent()

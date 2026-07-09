@@ -25,7 +25,7 @@ class QueueManagerAgent:
 
     def __init__(self) -> None:
         self.queues: Dict[str, List[QueueItem]] = {"render": [], "ocr": [], "narration": [], "download": [], "publishing": []}
-        self.is_running = False
+        self.is_running: Dict[str, bool] = {}
 
     async def enqueue(self, item: QueueItem) -> Dict[str, Any]:
         """Adds an item to the specified queue."""
@@ -73,9 +73,9 @@ class QueueManagerAgent:
 
     async def start_worker(self, queue_name: str) -> None:
         """Starts a background worker loop for a specific queue."""
-        self.is_running = True
+        self.is_running[queue_name] = True
         logger.info(f"Started worker for {queue_name} queue.")
-        while self.is_running:
+        while self.is_running.get(queue_name, False):
             item = await self.dequeue_highest_priority(queue_name)
             if item:
                 # Simulate processing
@@ -85,6 +85,13 @@ class QueueManagerAgent:
                 await asyncio.sleep(1)
 
     async def stop_workers(self) -> None:
-        """Gracefully shuts down workers."""
-        self.is_running = False
-        logger.info("Workers stopped.")
+        """Gracefully shuts down all workers."""
+        for queue_name in list(self.is_running.keys()):
+            self.is_running[queue_name] = False
+        logger.info("All workers stopped.")
+
+    async def stop_worker(self, queue_name: str) -> None:
+        """Gracefully shuts down a specific worker."""
+        if queue_name in self.is_running:
+            self.is_running[queue_name] = False
+            logger.info(f"Worker for {queue_name} stopped.")

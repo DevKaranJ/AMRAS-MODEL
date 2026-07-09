@@ -1,4 +1,5 @@
 import os
+import shutil
 from typing import Any, Dict, List
 
 from app.core.logger import get_logger
@@ -21,10 +22,9 @@ class AssetManagerAgent:
         """Registers a new asset."""
         project_dir = os.path.join(self.base_storage_path, str(project_id))
         os.makedirs(project_dir, exist_ok=True)
-        # Assuming path is moved/copied to project_dir in reality
         asset_path = os.path.join(project_dir, os.path.basename(path))
-        with open(asset_path, 'w') as f:
-            f.write(f"Asset: {asset_type}")
+        # Copy the actual file instead of writing placeholder
+        shutil.copy(path, asset_path)
 
         logger.info(f"Registered {asset_type} asset for project {project_id} at {asset_path}.")
         return {"project_id": project_id, "asset_type": asset_type, "path": asset_path, "status": "registered"}

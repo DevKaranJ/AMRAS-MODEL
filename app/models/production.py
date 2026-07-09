@@ -67,7 +67,7 @@ class InstalledModels(Base, TimestampMixin):
     __tablename__ = "installed_models"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(255))
+    name: Mapped[str] = mapped_column(String(255), unique=True)
     version: Mapped[Optional[str]] = mapped_column(String(100))
     provider: Mapped[str] = mapped_column(String(100))
     status: Mapped[str] = mapped_column(String(50))
