@@ -1,6 +1,7 @@
 import logging
 from typing import Any, Dict, List
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.vision import Narration
@@ -59,6 +60,15 @@ class MetadataAgent:
     ) -> VideoMetadata:
         """Construct the overall video metadata block and persist to DB."""
         logger.info(f"Generating final video metadata block for job {job_id}.")
+
+        # Check for existing metadata first to avoid duplicate inserts
+        result = await db.execute(select(VideoMetadata).where(VideoMetadata.job_id == job_id))
+        existing_metadata = result.scalars().first()
+
+        if existing_metadata:
+            logger.info(f"Found existing video metadata for job {job_id}")
+            return existing_metadata
+
         metadata = VideoMetadata(
             job_id=job_id,
             chapters=chapters,

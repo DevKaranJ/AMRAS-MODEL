@@ -100,7 +100,7 @@ def upgrade() -> None:
     sa.Column('ab_testing_metadata', sa.JSON(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ),
+    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('job_id')
     )
@@ -113,7 +113,7 @@ def upgrade() -> None:
     sa.Column('published_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ),
+    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('youtube_video_id')
     )
@@ -126,7 +126,7 @@ def upgrade() -> None:
     sa.Column('timezone', sa.String(length=50), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ),
+    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_publishing_schedules_job_id'), 'publishing_schedules', ['job_id'], unique=False)
@@ -137,7 +137,7 @@ def upgrade() -> None:
     sa.Column('target_keywords', sa.JSON(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ),
+    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_seo_profiles_job_id'), 'seo_profiles', ['job_id'], unique=False)
@@ -166,7 +166,7 @@ def upgrade() -> None:
     sa.Column('made_for_kids', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ),
+    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_video_metadata_job_id'), 'video_metadata', ['job_id'], unique=True)
@@ -223,7 +223,7 @@ def upgrade() -> None:
     sa.Column('has_chapters', sa.Boolean(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.ForeignKeyConstraint(['profile_id'], ['seo_profiles.id'], ),
+    sa.ForeignKeyConstraint(['profile_id'], ['seo_profiles.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_video_descriptions_profile_id'), 'video_descriptions', ['profile_id'], unique=False)
@@ -235,7 +235,7 @@ def upgrade() -> None:
     sa.Column('relevance_score', sa.Float(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.ForeignKeyConstraint(['profile_id'], ['seo_profiles.id'], ),
+    sa.ForeignKeyConstraint(['profile_id'], ['seo_profiles.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_video_tags_profile_id'), 'video_tags', ['profile_id'], unique=False)
@@ -247,7 +247,7 @@ def upgrade() -> None:
     sa.Column('score', sa.Float(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.ForeignKeyConstraint(['profile_id'], ['seo_profiles.id'], ),
+    sa.ForeignKeyConstraint(['profile_id'], ['seo_profiles.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_video_titles_profile_id'), 'video_titles', ['profile_id'], unique=False)
@@ -260,7 +260,7 @@ def upgrade() -> None:
     sa.Column('metadata_info', sa.JSON(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ),
+    sa.ForeignKeyConstraint(['job_id'], ['publishing_jobs.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['scene_id'], ['timeline_scenes.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -273,7 +273,7 @@ def upgrade() -> None:
     sa.Column('composition_rules', sa.JSON(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.ForeignKeyConstraint(['thumbnail_id'], ['thumbnails.id'], ),
+    sa.ForeignKeyConstraint(['thumbnail_id'], ['thumbnails.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_thumbnail_variants_thumbnail_id'), 'thumbnail_variants', ['thumbnail_id'], unique=False)

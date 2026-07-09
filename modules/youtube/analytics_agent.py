@@ -1,6 +1,7 @@
 import logging
 from typing import Any, Dict, List
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.youtube import AnalyticsProfile
@@ -21,6 +22,14 @@ class AnalyticsAgent:
     ) -> AnalyticsProfile:
         """Generate CTR Baseline, Retention Markers, A/B Testing Metadata and persist to DB."""
         logger.info(f"Preparing analytics baseline for job {job_id}")
+
+        # Check for existing profile first to avoid duplicate inserts
+        result = await db.execute(select(AnalyticsProfile).where(AnalyticsProfile.job_id == job_id))
+        existing_profile = result.scalars().first()
+
+        if existing_profile:
+            logger.info(f"Found existing analytics profile for job {job_id}")
+            return existing_profile
 
         # Mock logic to construct expected markers based on tags/metadata
         retention_markers = [

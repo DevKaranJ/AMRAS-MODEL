@@ -1,7 +1,6 @@
-from datetime import datetime, timezone
 from typing import Any, List
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException, status
 
 from app.schemas.youtube import GenerateThumbnailRequest, ThumbnailResponse
 
@@ -14,19 +13,13 @@ async def generate_thumbnails(request: GenerateThumbnailRequest) -> Any:
     Trigger the thumbnail generation pipeline (Planning and Composition).
     Returns a list of potential thumbnail base structures (mocked async response).
     """
-    # Mocking behavior
-    return [
-        ThumbnailResponse(
-            id=1,
-            job_id=request.project_id,
-            scene_id=10,
-            base_image_path="storage/thumbnail/10.png",
-            score=95.0,
-            variants=[],
-            created_at=datetime.now(timezone.utc),
-            updated_at=datetime.now(timezone.utc),
-        )
-    ]
+    # TODO: Implement real thumbnail generation pipeline
+    # Should use request.number_of_variants, request.style, etc.
+    # to delegate to thumbnail agents (PlanningAgent, CompositionAgent)
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Thumbnail generation pipeline not yet implemented"
+    )
 
 
 @router.get("", response_model=List[ThumbnailResponse])
@@ -34,4 +27,9 @@ async def list_thumbnails(project_id: int) -> Any:
     """
     Retrieve generated thumbnails for a specific project.
     """
-    return []
+    # TODO: Query database for thumbnails by project_id
+    # Should query Thumbnail model and related variants from persistence layer
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Thumbnail listing not yet implemented"
+    )
