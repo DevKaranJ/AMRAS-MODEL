@@ -155,3 +155,28 @@ __all__.extend(
         "AnalyticsProfile",
     ]
 )
+from app.models.production import (
+    ApplicationSettings,
+    BackupHistory,
+    InstalledModels,
+    NotificationHistory,
+    PipelineHistory,
+    ProjectHistory,
+    StorageStatistics,
+    SystemHealth,
+    UserPreferences,
+)
+
+__all__.extend(
+    [
+        "ApplicationSettings",
+        "BackupHistory",
+        "InstalledModels",
+        "NotificationHistory",
+        "PipelineHistory",
+        "ProjectHistory",
+        "StorageStatistics",
+        "SystemHealth",
+        "UserPreferences",
+    ]
+)

@@ -1,6 +1,7 @@
+from unittest.mock import AsyncMock
+
 import pytest
 
-from unittest.mock import AsyncMock
 
 @pytest.fixture
 def mock_db_session() -> AsyncMock:
@@ -91,7 +92,6 @@ async def test_metadata_agent_video_metadata(mock_db_session: AsyncMock) -> None
 @pytest.mark.asyncio
 async def test_playlist_agent(mock_db_session: AsyncMock) -> None:
     from modules.youtube.playlist_agent import PlaylistAgent
-    from app.models.youtube import Playlist
     agent = PlaylistAgent()
 
     # Mock DB empty result
