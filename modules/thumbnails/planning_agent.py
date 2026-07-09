@@ -1,12 +1,11 @@
 import logging
-from typing import List, Any, Dict
+from typing import Any, Dict, List
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.timeline import TimelineScene
 from app.models.youtube import Thumbnail
-from app.schemas.youtube import ThumbnailCreate
 
 logger = logging.getLogger(__name__)
 

@@ -1,6 +1,7 @@
-import pytest
-from sqlalchemy.ext.asyncio import AsyncSession
 from unittest.mock import AsyncMock
+
+import pytest
+
 
 @pytest.fixture
 def mock_db_session() -> AsyncMock:
@@ -9,9 +10,9 @@ def mock_db_session() -> AsyncMock:
 
 from app.models.timeline import TimelineScene
 from app.models.youtube import Thumbnail
-from modules.thumbnails.planning_agent import ThumbnailPlanningAgent
 from modules.thumbnails.composition_agent import ThumbnailCompositionAgent
-from app.schemas.youtube import ThumbnailBase
+from modules.thumbnails.planning_agent import ThumbnailPlanningAgent
+
 
 @pytest.mark.asyncio
 async def test_thumbnail_planning_agent(mock_db_session: AsyncMock) -> None:

@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.youtube import Thumbnail, ThumbnailVariant
-from app.schemas.youtube import ThumbnailBase
 
 logger = logging.getLogger(__name__)
 

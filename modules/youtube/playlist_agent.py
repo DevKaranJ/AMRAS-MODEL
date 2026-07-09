@@ -1,8 +1,8 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.youtube import Playlist
 
