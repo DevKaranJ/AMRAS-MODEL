@@ -25,7 +25,5 @@ class TransitionAgent:
     async def execute(self, input_data: TransitionInput) -> TransitionOutput:
         # Mock implementation
         return TransitionOutput(
-            status="completed",
-            output_path="/storage/video/transitions/temp_trans.mp4",
-            render_time_ms=1500
+            status="completed", output_path="/storage/video/transitions/temp_trans.mp4", render_time_ms=1500
         )

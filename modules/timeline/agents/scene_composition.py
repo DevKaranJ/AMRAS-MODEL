@@ -15,7 +15,7 @@ class SceneCompositionAgent:
             dialogue_density=0.5,
             is_battle=False,
             is_flashback=False,
-            config={"focus": "center"}
+            config={"focus": "center"},
         )
 
     def calculate_safe_crop(self, panel_data: Dict[str, Any]) -> Dict[str, float]:

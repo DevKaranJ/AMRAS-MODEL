@@ -16,6 +16,7 @@ from app.schemas.production import (
 
 router = APIRouter()
 
+
 @router.get("/dashboard", response_model=Dict[str, Any])
 async def get_dashboard(db: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
     """Retrieve main dashboard metrics."""
@@ -33,10 +34,12 @@ async def get_dashboard(db: AsyncSession = Depends(get_db_session)) -> Dict[str,
         "storage_usage_bytes": 0,
     }
 
+
 @router.get("/system/health", response_model=List[SystemHealthResponse])
 async def get_system_health(db: AsyncSession = Depends(get_db_session)) -> List[SystemHealthResponse]:
     """Retrieve system health statistics (stub)."""
     return []
+
 
 @router.get("/system/resources", response_model=Dict[str, Any])
 async def get_system_resources(db: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
@@ -49,55 +52,72 @@ async def get_system_resources(db: AsyncSession = Depends(get_db_session)) -> Di
         "vram_usage": 0.0,
     }
 
+
 @router.get("/projects", response_model=List[Dict[str, Any]])
 async def list_projects(db: AsyncSession = Depends(get_db_session)) -> List[Dict[str, Any]]:
     """List all projects for the dashboard (stub)."""
     return []
+
 
 @router.post("/projects", response_model=Dict[str, Any], status_code=status.HTTP_201_CREATED)
 async def create_project(project_data: Dict[str, Any], db: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
     """Create a new project (stub)."""
     raise HTTPException(status_code=501, detail="Not implemented")
 
+
 @router.post("/pipeline/run")
 async def run_pipeline(config: Dict[str, Any], db: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
     """Start the entire pipeline for a project (stub)."""
     return {"status": "started", "job_id": 1}
 
+
 @router.post("/pipeline/resume")
-async def resume_pipeline(job_id: int = Body(..., embed=True), db: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
+async def resume_pipeline(
+    job_id: int = Body(..., embed=True), db: AsyncSession = Depends(get_db_session)
+) -> Dict[str, Any]:
     """Resume an interrupted pipeline (stub)."""
     return {"status": "resumed", "job_id": job_id}
+
 
 @router.post("/system/backup", response_model=BackupHistoryResponse)
 async def create_backup(db: AsyncSession = Depends(get_db_session)) -> BackupHistoryResponse:
     """Create a system backup (stub)."""
     raise HTTPException(status_code=501, detail="Not implemented")
 
+
 @router.post("/system/restore")
-async def restore_backup(backup_id: int = Body(..., embed=True), db: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
+async def restore_backup(
+    backup_id: int = Body(..., embed=True), db: AsyncSession = Depends(get_db_session)
+) -> Dict[str, Any]:
     """Restore from a backup (stub)."""
     return {"status": "restoring"}
+
 
 @router.get("/models", response_model=List[InstalledModelsResponse])
 async def list_models(db: AsyncSession = Depends(get_db_session)) -> List[InstalledModelsResponse]:
     """List installed models (stub)."""
     return []
 
+
 @router.post("/models/install", response_model=InstalledModelsResponse)
-async def install_model(model_data: Dict[str, Any], db: AsyncSession = Depends(get_db_session)) -> InstalledModelsResponse:
+async def install_model(
+    model_data: Dict[str, Any], db: AsyncSession = Depends(get_db_session)
+) -> InstalledModelsResponse:
     """Install a new AI model (stub)."""
     raise HTTPException(status_code=501, detail="Not implemented")
+
 
 @router.get("/storage", response_model=List[StorageStatisticsResponse])
 async def get_storage_stats(db: AsyncSession = Depends(get_db_session)) -> List[StorageStatisticsResponse]:
     """Retrieve storage statistics (stub)."""
     return []
 
+
 @router.post("/storage/cleanup")
 async def cleanup_storage(db: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
     """Clean up temporary files and caches (stub)."""
     return {"status": "cleaning"}
+
 
 @router.get("/logs")
 async def get_logs(db: AsyncSession = Depends(get_db_session)) -> List[Dict[str, Any]]:

@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append('.')
+sys.path.append(".")
 
 import pytest
 
@@ -24,7 +24,7 @@ class TestTimelineDatabase:
                 sequence_number=i,
                 start_time_ms=i * 2000,
                 end_time_ms=(i + 1) * 2000,
-                duration_ms=2000
+                duration_ms=2000,
             )
             scenes.append(scene)
 

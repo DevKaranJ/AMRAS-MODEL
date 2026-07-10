@@ -1,4 +1,3 @@
-
 from pydantic import BaseModel
 
 
@@ -18,10 +17,7 @@ class ResourceManagementAgent:
     async def get_system_status(self) -> ResourceStatus:
         # Mock implementation
         return ResourceStatus(
-            cpu_usage_percent=45.0,
-            gpu_usage_percent=60.0,
-            ram_available_mb=16384.0,
-            disk_available_mb=102400.0
+            cpu_usage_percent=45.0, gpu_usage_percent=60.0, ram_available_mb=16384.0, disk_available_mb=102400.0
         )
 
     async def cleanup_temp_files(self, job_id: int) -> bool:

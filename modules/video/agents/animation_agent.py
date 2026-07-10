@@ -23,7 +23,4 @@ class AnimationAgent:
 
     async def execute(self, input_data: AnimationInput) -> AnimationOutput:
         # Mock implementation
-        return AnimationOutput(
-            status="success",
-            interpolation_data={"frames": 60, "keyframes": []}
-        )
+        return AnimationOutput(status="success", interpolation_data={"frames": 60, "keyframes": []})

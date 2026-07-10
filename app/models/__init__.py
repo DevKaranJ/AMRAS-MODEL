@@ -17,6 +17,17 @@ from app.models.memory import (
     RetrievalIndex,
     WorldMemory,
 )
+from app.models.production import (
+    ApplicationSettings,
+    BackupHistory,
+    InstalledModels,
+    NotificationHistory,
+    PipelineHistory,
+    ProjectHistory,
+    StorageStatistics,
+    SystemHealth,
+    UserPreferences,
+)
 from app.models.qa import (
     ApprovalHistory,
     AutoFixHistory,
@@ -88,17 +99,6 @@ from app.models.youtube import (
     ThumbnailVariant,
     Title,
     VideoMetadata,
-)
-from app.models.production import (
-    ApplicationSettings,
-    BackupHistory,
-    InstalledModels,
-    NotificationHistory,
-    PipelineHistory,
-    ProjectHistory,
-    StorageStatistics,
-    SystemHealth,
-    UserPreferences,
 )
 
 __all__ = [
@@ -195,4 +195,27 @@ __all__ = [
     "StorageStatistics",
     "SystemHealth",
     "UserPreferences",
+    "Benchmarks",
+    "OptimizationHistory",
+    "PerformanceProfiles",
+    "ResourceUsage",
+    "CostReports",
+    "ModelBenchmarks",
+    "InferenceCache",
+    "DeploymentProfiles",
+    "ArchiveHistory",
+    "DependencyGraph",
 ]
+
+from app.models.optimization import (
+    ArchiveHistory,
+    Benchmarks,
+    CostReports,
+    DependencyGraph,
+    DeploymentProfiles,
+    InferenceCache,
+    ModelBenchmarks,
+    OptimizationHistory,
+    PerformanceProfiles,
+    ResourceUsage,
+)

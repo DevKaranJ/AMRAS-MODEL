@@ -20,9 +20,11 @@ def db_session_mock():
     mock.refresh = AsyncMock()
     return mock
 
+
 @pytest.fixture
 def engine(db_session_mock):
     return AudioProductionEngine(db=db_session_mock)
+
 
 @pytest.mark.asyncio
 async def test_engine_process_segments(engine, tmp_path):
@@ -39,6 +41,7 @@ async def test_engine_process_segments(engine, tmp_path):
     assert master_file.endswith("master_normalized.wav")
     assert engine.db.add.called
     assert engine.db.commit.called
+
 
 @pytest.mark.asyncio
 async def test_engine_empty_segments(engine, tmp_path):

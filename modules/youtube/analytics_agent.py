@@ -17,9 +17,7 @@ class AnalyticsAgent:
     def __init__(self, ai_provider_manager: Any = None) -> None:
         self.ai = ai_provider_manager
 
-    async def prepare_analytics_baseline(
-        self, db: AsyncSession, job_id: int, tags: List[str]
-    ) -> AnalyticsProfile:
+    async def prepare_analytics_baseline(self, db: AsyncSession, job_id: int, tags: List[str]) -> AnalyticsProfile:
         """Generate CTR Baseline, Retention Markers, A/B Testing Metadata and persist to DB."""
         logger.info(f"Preparing analytics baseline for job {job_id}")
 

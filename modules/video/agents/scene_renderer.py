@@ -33,5 +33,5 @@ class SceneRendererAgent:
             scene_id=input_data.scene_id,
             status="completed",
             output_path=f"/storage/video/scenes/scene_{input_data.scene_id}.mp4",
-            render_time_ms=5000
+            render_time_ms=5000,
         )

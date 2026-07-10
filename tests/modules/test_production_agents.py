@@ -27,16 +27,18 @@ async def setup_db() -> AsyncGenerator[None, None]:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
+
 @pytest.fixture
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
     async with TestingSessionLocal() as session:
         yield session
 
+
 async def test_workflow_manager_agent(db_session: AsyncSession) -> None:
     # Setup dummy job
     job = Job(name="test_job", status="queued")
     db_session.add(job)
-    await db_session.flush() # Ensure ID is generated without detaching/expiring
+    await db_session.flush()  # Ensure ID is generated without detaching/expiring
     job_id = job.id
 
     agent = WorkflowManagerAgent()
@@ -63,6 +65,7 @@ async def test_workflow_manager_agent(db_session: AsyncSession) -> None:
     assert retry_res["status"] == "retrying"
     assert retry_res["job_id"] == job_id
 
+
 async def test_queue_manager_agent() -> None:
     agent = QueueManagerAgent()
     item = QueueItem(job_id=1, project_id=1, queue_name="render")
@@ -80,6 +83,7 @@ async def test_queue_manager_agent() -> None:
     q_status = await agent.get_queue_status("render")
     assert q_status[0].priority == 10
 
+
 import tempfile
 
 
@@ -93,6 +97,7 @@ async def test_asset_manager_agent() -> None:
         assert len(assets) == 1
         assert assets[0]["filename"] == "test_file.png"
 
+
 async def test_model_manager_agent(db_session: AsyncSession) -> None:
     agent = AIModelManagerAgent()
     res = await agent.allocate_gpu("test_model", 4000)
@@ -104,6 +109,7 @@ async def test_model_manager_agent(db_session: AsyncSession) -> None:
     assert len(models) == 1
     assert models[0]["name"] == "test_local"
 
+
 async def test_settings_agent() -> None:
     agent = SettingsAgent()
     settings = await agent.get_global_settings()
@@ -111,12 +117,14 @@ async def test_settings_agent() -> None:
     updated = await agent.update_global_settings({"theme": "dark"})
     assert updated["theme"] == "dark"
 
+
 async def test_recovery_agent() -> None:
     agent = RecoveryAgent()
     res = await agent.scan_for_interrupted_jobs()
     assert res["found"] == 0
     valid = await agent.verify_cache_integrity()
     assert valid is True
+
 
 async def test_qa_agent() -> None:
     agent = QAAgent()
@@ -126,6 +134,7 @@ async def test_qa_agent() -> None:
     assert len(errors2) == 0
     valid = await agent.verify_output_assets(1)
     assert valid is True
+
 
 async def test_queue_manager_agent_priority() -> None:
     agent = QueueManagerAgent()
@@ -138,6 +147,7 @@ async def test_queue_manager_agent_priority() -> None:
     assert item is not None
     assert item.job_id == 2
     assert item.status == "running"
+
 
 async def test_queue_manager_agent_requeue() -> None:
     agent = QueueManagerAgent()

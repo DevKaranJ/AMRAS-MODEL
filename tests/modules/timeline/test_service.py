@@ -10,6 +10,7 @@ from modules.timeline.service import TimelineService
 def mock_db_session() -> AsyncMock:
     return AsyncMock()
 
+
 class TestTimelineService:
     @pytest.mark.asyncio
     async def test_generate_timeline_success(self, mock_db_session: AsyncMock) -> None:
