@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
 import psutil
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -65,7 +65,7 @@ async def run_pipeline(config: Dict[str, Any], db: AsyncSession = Depends(get_db
     return {"status": "started", "job_id": 1}
 
 @router.post("/pipeline/resume")
-async def resume_pipeline(job_id: int, db: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
+async def resume_pipeline(job_id: int = Body(..., embed=True), db: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
     """Resume an interrupted pipeline (stub)."""
     return {"status": "resumed", "job_id": job_id}
 
@@ -75,7 +75,7 @@ async def create_backup(db: AsyncSession = Depends(get_db_session)) -> BackupHis
     raise HTTPException(status_code=501, detail="Not implemented")
 
 @router.post("/system/restore")
-async def restore_backup(backup_id: int, db: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
+async def restore_backup(backup_id: int = Body(..., embed=True), db: AsyncSession = Depends(get_db_session)) -> Dict[str, Any]:
     """Restore from a backup (stub)."""
     return {"status": "restoring"}
 

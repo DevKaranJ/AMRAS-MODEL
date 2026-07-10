@@ -83,7 +83,7 @@ class MockAIProvider(AIProviderInterface):
             import json
 
             # Mock response generator based on schema types
-            mock_resp = {}
+            mock_resp: Dict[str, Any] = {}
             for k, v in response_format.get("properties", {}).items():
                 prop_type = v.get("type", "string")
                 if prop_type == "array":
@@ -91,7 +91,7 @@ class MockAIProvider(AIProviderInterface):
                     items_schema = v.get("items", {})
                     if items_schema.get("type") == "object":
                         # Create a mock object based on items properties
-                        mock_item = {}
+                        mock_item: Dict[str, Any] = {}
                         for item_k, item_v in items_schema.get("properties", {}).items():
                             item_type = item_v.get("type", "string")
                             if item_type == "integer":

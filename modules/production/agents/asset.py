@@ -1,3 +1,4 @@
+import asyncio
 import os
 import shutil
 from typing import Any, Dict, List
@@ -23,8 +24,8 @@ class AssetManagerAgent:
         project_dir = os.path.join(self.base_storage_path, str(project_id))
         os.makedirs(project_dir, exist_ok=True)
         asset_path = os.path.join(project_dir, os.path.basename(path))
-        # Copy the actual file instead of writing placeholder
-        shutil.copy(path, asset_path)
+        # Copy the actual file instead of writing placeholder (non-blocking)
+        await asyncio.to_thread(shutil.copy, path, asset_path)
 
         logger.info(f"Registered {asset_type} asset for project {project_id} at {asset_path}.")
         return {"project_id": project_id, "asset_type": asset_type, "path": asset_path, "status": "registered"}
