@@ -1,6 +1,7 @@
 from typing import Any, Dict, List
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import get_logger
@@ -42,18 +43,8 @@ class AIModelManagerAgent:
 
     async def install_local_model(self, model_name: str, source_url: str, db: AsyncSession) -> Dict[str, Any]:
         """Downloads and installs a local AI model."""
-        # Check if model already exists
-        result = await db.execute(select(InstalledModels).where(InstalledModels.name == model_name))
-        existing_model = result.scalar_one_or_none()
-
-        if existing_model:
-            # Update existing model
-            existing_model.provider = "local"
-            existing_model.status = "installed"
-            existing_model.path = source_url
-            logger.info(f"Updated existing model {model_name} from {source_url}.")
-        else:
-            # Create new model
+        try:
+            # Try to insert new model first (optimistic approach)
             model = InstalledModels(
                 name=model_name,
                 provider="local",
@@ -61,7 +52,31 @@ class AIModelManagerAgent:
                 path=source_url
             )
             db.add(model)
+            await db.commit()
             logger.info(f"Installing model {model_name} from {source_url}.")
-
-        await db.commit()
-        return {"model": model_name, "status": "installed"}
+            return {"model": model_name, "status": "installed"}
+        except IntegrityError:
+            # Handle concurrent insert or existing model - rollback and update
+            await db.rollback()
+            result = await db.execute(select(InstalledModels).where(InstalledModels.name == model_name))
+            existing_model = result.scalar_one_or_none()
+            if existing_model:
+                # Update existing model
+                existing_model.provider = "local"
+                existing_model.status = "installed"
+                existing_model.path = source_url
+                try:
+                    await db.commit()
+                    logger.info(f"Updated existing model {model_name} from {source_url}.")
+                    return {"model": model_name, "status": "installed"}
+                except Exception as e:
+                    await db.rollback()
+                    logger.error(f"Failed to update model {model_name}: {e}")
+                    raise
+            else:
+                logger.error(f"Failed to install model {model_name} due to integrity constraint.")
+                raise
+        except Exception as e:
+            await db.rollback()
+            logger.error(f"Failed to install model {model_name}: {e}")
+            raise

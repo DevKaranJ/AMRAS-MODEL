@@ -42,16 +42,19 @@ class WorkflowManagerAgent:
         """Pauses a running workflow."""
         logger.info(f"Pausing workflow for job {job_id}.")
 
-        # Update in-memory tracking
-        if job_id in self.running_workflows:
-            self.running_workflows[job_id]["status"] = "paused"
-
         # Update Job status in database
         result = await db.execute(select(Job).where(Job.id == job_id))
         job = result.scalar_one_or_none()
-        if job:
-            job.status = "paused"
-            await db.commit()
+        if not job:
+            logger.warning(f"Job {job_id} not found, cannot pause.")
+            return {"job_id": job_id, "status": "failed", "error": "Job not found"}
+
+        job.status = "paused"
+        await db.commit()
+
+        # Update in-memory tracking
+        if job_id in self.running_workflows:
+            self.running_workflows[job_id]["status"] = "paused"
 
         # Update pipeline history status
         result = await db.execute(
@@ -69,16 +72,19 @@ class WorkflowManagerAgent:
         """Cancels a running workflow."""
         logger.info(f"Canceling workflow for job {job_id}.")
 
-        # Update in-memory tracking
-        if job_id in self.running_workflows:
-            self.running_workflows[job_id]["status"] = "canceled"
-
         # Update Job status in database
         result = await db.execute(select(Job).where(Job.id == job_id))
         job = result.scalar_one_or_none()
-        if job:
-            job.status = "canceled"
-            await db.commit()
+        if not job:
+            logger.warning(f"Job {job_id} not found, cannot cancel.")
+            return {"job_id": job_id, "status": "failed", "error": "Job not found"}
+
+        job.status = "canceled"
+        await db.commit()
+
+        # Update in-memory tracking
+        if job_id in self.running_workflows:
+            self.running_workflows[job_id]["status"] = "canceled"
 
         # Update pipeline history status
         result = await db.execute(
@@ -96,6 +102,28 @@ class WorkflowManagerAgent:
         """Resumes an interrupted workflow from a specific stage."""
         logger.info(f"Resuming workflow for job {job_id} at stage {failed_stage}.")
 
+        # Update Job status in database
+        result = await db.execute(select(Job).where(Job.id == job_id))
+        job = result.scalar_one_or_none()
+        if not job:
+            logger.warning(f"Job {job_id} not found, cannot resume.")
+            return {"job_id": job_id, "status": "failed", "error": "Job not found"}
+
+        # Update pipeline history for the specific stage
+        result = await db.execute(
+            select(PipelineHistory)
+            .where(PipelineHistory.job_id == job_id)
+            .where(PipelineHistory.stage == failed_stage)
+        )
+        history = result.scalar_one_or_none()
+        if not history:
+            logger.warning(f"Pipeline history for job {job_id} stage {failed_stage} not found, cannot resume.")
+            return {"job_id": job_id, "status": "failed", "error": "Pipeline stage not found"}
+
+        job.status = "running"
+        history.status = "running"
+        await db.commit()
+
         # Update in-memory tracking
         if job_id in self.running_workflows:
             self.running_workflows[job_id]["status"] = "running"
@@ -105,24 +133,6 @@ class WorkflowManagerAgent:
                 "status": "running",
                 "current_stage": failed_stage
             }
-
-        # Update Job status in database
-        result = await db.execute(select(Job).where(Job.id == job_id))
-        job = result.scalar_one_or_none()
-        if job:
-            job.status = "running"
-            await db.commit()
-
-        # Update pipeline history for the specific stage
-        result = await db.execute(
-            select(PipelineHistory)
-            .where(PipelineHistory.job_id == job_id)
-            .where(PipelineHistory.stage == failed_stage)
-        )
-        history = result.scalar_one_or_none()
-        if history:
-            history.status = "running"
-            await db.commit()
 
         return {"job_id": job_id, "status": "resumed", "current_stage": failed_stage}
 
