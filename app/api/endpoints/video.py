@@ -16,6 +16,7 @@ from app.schemas.video import (
 
 router = APIRouter()
 
+
 @router.post(
     "/start",
     response_model=RenderJobResponse,
@@ -40,6 +41,7 @@ async def start_render(
         "updated_at": "2023-01-01T00:00:00Z",
     }
 
+
 @router.post(
     "/resume",
     response_model=RenderJobResponse,
@@ -62,6 +64,7 @@ async def resume_render(
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z",
     }
+
 
 @router.post(
     "/cancel",
@@ -86,6 +89,7 @@ async def cancel_render(
         "updated_at": "2023-01-01T00:00:00Z",
     }
 
+
 @router.get(
     "/status/{job_id}",
     response_model=RenderStatusResponse,
@@ -103,6 +107,7 @@ async def get_render_status(
         "progress": 45.5,
         "message": "Rendering scene 5 of 10",
     }
+
 
 @router.get(
     "/report/{job_id}",
@@ -129,6 +134,7 @@ async def get_render_report(
         "updated_at": "2023-01-01T00:00:00Z",
     }
 
+
 @router.get(
     "/output/{job_id}",
     response_model=RenderOutputResponse,
@@ -145,6 +151,7 @@ async def get_render_output(
         "master_video": "/storage/video/master/project_1_final.mp4",
         "preview_video": "/storage/video/preview/project_1_preview.mp4",
     }
+
 
 @router.get(
     "/jobs",

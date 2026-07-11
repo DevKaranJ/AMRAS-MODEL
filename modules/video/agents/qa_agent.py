@@ -30,10 +30,4 @@ class QAAgent:
         if not input_data.video_path:
             raise QAValidationError(reason="No video path provided for QA")
 
-        return QAReport(
-            passed=True,
-            dropped_frames=0,
-            black_frames=0,
-            sync_drift_ms=10,
-            artifacts_detected=[]
-        )
+        return QAReport(passed=True, dropped_frames=0, black_frames=0, sync_drift_ms=10, artifacts_detected=[])

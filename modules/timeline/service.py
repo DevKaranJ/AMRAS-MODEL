@@ -39,8 +39,7 @@ class TimelineService:
 
         # 1. Create Initial Draft
         timeline_schema = self.planning_agent.create_initial_timeline(
-            project_id=request.project_id,
-            settings=request.settings or {}
+            project_id=request.project_id, settings=request.settings or {}
         )
 
         # Persist timeline to database
@@ -48,7 +47,7 @@ class TimelineService:
             project_id=timeline_schema.project_id,
             status=timeline_schema.status,
             duration_ms=timeline_schema.duration_ms,
-            settings=timeline_schema.settings
+            settings=timeline_schema.settings,
         )
         self.db.add(timeline)
         await self.db.flush()
@@ -72,15 +71,13 @@ class TimelineService:
                 start_time_ms=scene_schema.start_time_ms,
                 end_time_ms=scene_schema.end_time_ms,
                 duration_ms=scene_schema.duration_ms,
-                page_id=scene_schema.page_id
+                page_id=scene_schema.page_id,
             )
             self.db.add(scene)
             await self.db.flush()
 
             panels = self.panel_selection.select_panels(
-                scene_id=scene.id,
-                page_data=pages[0],
-                scene_duration_ms=scene_schema.duration_ms
+                scene_id=scene.id, page_data=pages[0], scene_duration_ms=scene_schema.duration_ms
             )
             ordered_panels = self.reading_flow.order_panels([p.model_dump() for p in panels])
 
@@ -90,12 +87,11 @@ class TimelineService:
                 panel_metadata = {
                     "emotion": panel_dict.get("emotion", "neutral"),
                     "is_action": panel_dict.get("is_action", False),
-                    "dialogue_density": panel_dict.get("dialogue_density", 0.0)
+                    "dialogue_density": panel_dict.get("dialogue_density", 0.0),
                 }
 
                 camera_path = self.camera_director.plan_camera_movement(
-                    panel_metadata=panel_metadata,
-                    duration_ms=panel_dict.get("duration_ms", 0)
+                    panel_metadata=panel_metadata, duration_ms=panel_dict.get("duration_ms", 0)
                 )
 
                 # Create panel in database
@@ -106,7 +102,7 @@ class TimelineService:
                     start_time_ms=panel_dict.get("start_time_ms", 0),
                     end_time_ms=panel_dict.get("end_time_ms", 0),
                     duration_ms=panel_dict.get("duration_ms", 0),
-                    importance_score=panel_dict.get("importance_score", 0.0)
+                    importance_score=panel_dict.get("importance_score", 0.0),
                 )
                 self.db.add(panel)
 
@@ -129,7 +125,7 @@ class TimelineService:
             "duration_ms": timeline.duration_ms,
             "scenes": [s.model_dump() for s in scenes],
             "panels": all_panels_data,
-            "camera_paths": all_camera_paths
+            "camera_paths": all_camera_paths,
         }
         issues = self.qa_agent.audit_timeline(timeline_data)
         if issues:
@@ -151,7 +147,7 @@ class TimelineService:
             "project_id": timeline.project_id,
             "status": timeline.status,
             "duration_ms": timeline.duration_ms,
-            "settings": timeline.settings
+            "settings": timeline.settings,
         }
 
     async def rebuild_timeline(self, request: TimelineRebuildRequest) -> Dict[str, Any]:
@@ -167,11 +163,7 @@ class TimelineService:
         timeline.status = "rebuilding"
         await self.db.commit()
 
-        return {
-            "status": "rebuilding",
-            "timeline_id": request.timeline_id,
-            "rebuild_scenes": request.rebuild_scenes
-        }
+        return {"status": "rebuilding", "timeline_id": request.timeline_id, "rebuild_scenes": request.rebuild_scenes}
 
     async def get_timeline_scenes(self, timeline_id: int) -> List[Dict[str, Any]]:
         """Get all scenes for a timeline."""
@@ -186,7 +178,7 @@ class TimelineService:
                 "sequence_number": scene.sequence_number,
                 "start_time_ms": scene.start_time_ms,
                 "end_time_ms": scene.end_time_ms,
-                "duration_ms": scene.duration_ms
+                "duration_ms": scene.duration_ms,
             }
             for scene in scenes
         ]
@@ -206,14 +198,7 @@ class TimelineService:
         camera_result = await self.db.execute(camera_stmt)
         cameras = camera_result.scalars().all()
 
-        return [
-            {
-                "id": camera.id,
-                "type": camera.type,
-                "duration_ms": camera.duration_ms
-            }
-            for camera in cameras
-        ]
+        return [{"id": camera.id, "type": camera.type, "duration_ms": camera.duration_ms} for camera in cameras]
 
     async def get_timeline_transitions(self, timeline_id: int) -> List[Dict[str, Any]]:
         """Get transitions for a timeline."""
@@ -233,5 +218,5 @@ class TimelineService:
             "project_id": project_id,
             "timeline_id": timeline.id,
             "status": timeline.status,
-            "duration_ms": timeline.duration_ms
+            "duration_ms": timeline.duration_ms,
         }

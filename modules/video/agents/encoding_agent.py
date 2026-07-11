@@ -33,8 +33,5 @@ class EncodingAgent:
             raise EncodingError(reason="Missing input path")
 
         return EncodingOutput(
-            status="completed",
-            output_path=input_data.output_path,
-            size_bytes=1048576,
-            duration_ms=60000
+            status="completed", output_path=input_data.output_path, size_bytes=1048576, duration_ms=60000
         )

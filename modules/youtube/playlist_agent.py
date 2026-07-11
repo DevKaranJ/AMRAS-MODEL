@@ -17,9 +17,7 @@ class PlaylistAgent:
     def __init__(self, youtube_client: Any = None) -> None:
         self.youtube = youtube_client  # Placeholder for actual API client
 
-    async def get_or_create_playlist(
-        self, db: AsyncSession, manga_id: int, series_title: str
-    ) -> Playlist:
+    async def get_or_create_playlist(self, db: AsyncSession, manga_id: int, series_title: str) -> Playlist:
         """Find an existing playlist for a manga or create a new one, persisting to DB."""
         logger.info(f"Looking up or creating playlist for manga {manga_id}: {series_title}")
 
@@ -46,9 +44,7 @@ class PlaylistAgent:
         logger.info(f"Created new playlist: {yt_playlist_id}")
         return playlist
 
-    async def add_video_to_playlist(
-        self, playlist_id: str, video_id: str, position: Optional[int] = None
-    ) -> bool:
+    async def add_video_to_playlist(self, playlist_id: str, video_id: str, position: Optional[int] = None) -> bool:
         """Add a video to a specific playlist and maintain order."""
         logger.info(f"Adding video {video_id} to playlist {playlist_id} at position {position}")
         # External API mock call

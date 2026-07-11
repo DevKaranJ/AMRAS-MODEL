@@ -7,7 +7,9 @@ class AudioSynchronizationAgent:
     def __init__(self, config: Optional[Dict[str, Any]] = None):
         self.config = config or {}
 
-    def synchronize(self, scenes: List[Dict[str, Any]], audio_segments: List[Dict[str, Any]]) -> List[SynchronizationCreate]:
+    def synchronize(
+        self, scenes: List[Dict[str, Any]], audio_segments: List[Dict[str, Any]]
+    ) -> List[SynchronizationCreate]:
         syncs = []
         for i, scene in enumerate(scenes):
             scene_start = scene.get("start_time_ms", 0)
@@ -25,7 +27,7 @@ class AudioSynchronizationAgent:
                     narration_id=audio.get("narration_id"),
                     start_time_ms=scene_start,
                     end_time_ms=audio_end,
-                    sync_accuracy=1.0
+                    sync_accuracy=1.0,
                 )
                 syncs.append(sync)
         return syncs

@@ -15,6 +15,7 @@ class AnimationProfile(Base, TimestampMixin):
     is_default: Mapped[bool] = mapped_column(Boolean, default=False)
     config: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
 
+
 class Timeline(Base, TimestampMixin):
     __tablename__ = "timelines"
 
@@ -24,6 +25,7 @@ class Timeline(Base, TimestampMixin):
     duration_ms: Mapped[int] = mapped_column(Integer, default=0)
     settings: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
 
+
 class Transition(Base, TimestampMixin):
     __tablename__ = "transitions"
 
@@ -31,6 +33,7 @@ class Transition(Base, TimestampMixin):
     type: Mapped[str] = mapped_column(String(100))
     duration_ms: Mapped[int] = mapped_column(Integer, default=0)
     config: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
+
 
 class SceneMetadata(Base, TimestampMixin):
     __tablename__ = "scene_metadata"
@@ -44,6 +47,7 @@ class SceneMetadata(Base, TimestampMixin):
     is_flashback: Mapped[bool] = mapped_column(Boolean, default=False)
     config: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
 
+
 class TimelineScene(Base, TimestampMixin):
     __tablename__ = "timeline_scenes"
 
@@ -56,6 +60,7 @@ class TimelineScene(Base, TimestampMixin):
     page_id: Mapped[Optional[int]] = mapped_column(ForeignKey("pages.id"), index=True)
     transition_id: Mapped[Optional[int]] = mapped_column(ForeignKey("transitions.id"))
     metadata_id: Mapped[Optional[int]] = mapped_column(ForeignKey("scene_metadata.id"))
+
 
 class CameraPath(Base, TimestampMixin):
     __tablename__ = "camera_paths"
@@ -71,6 +76,7 @@ class CameraPath(Base, TimestampMixin):
     duration_ms: Mapped[int] = mapped_column(Integer)
     config: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
 
+
 class TimelinePanel(Base, TimestampMixin):
     __tablename__ = "timeline_panels"
 
@@ -83,6 +89,7 @@ class TimelinePanel(Base, TimestampMixin):
     duration_ms: Mapped[int] = mapped_column(Integer)
     importance_score: Mapped[float] = mapped_column(Float, default=0.0)
     camera_path_id: Mapped[Optional[int]] = mapped_column(ForeignKey("camera_paths.id"))
+
 
 class Synchronization(Base, TimestampMixin):
     __tablename__ = "synchronizations"

@@ -81,10 +81,11 @@ async def normalize_audio(request: AudioNormalizeRequest, db: AsyncSession = Dep
         raise HTTPException(status_code=404, detail=f"Job {request.job_id} not found")
 
     # Find the master audio version
-    version_stmt = select(AudioVersion).where(
-        AudioVersion.job_id == request.job_id,
-        AudioVersion.type == "master"
-    ).order_by(AudioVersion.version_number.desc())
+    version_stmt = (
+        select(AudioVersion)
+        .where(AudioVersion.job_id == request.job_id, AudioVersion.type == "master")
+        .order_by(AudioVersion.version_number.desc())
+    )
     version_result = await db.execute(version_stmt)
     master_version = version_result.scalar_one_or_none()
 
@@ -107,7 +108,7 @@ async def normalize_audio(request: AudioNormalizeRequest, db: AsyncSession = Dep
         file_path=normalized_path,
         format="wav",
         type="normalized",
-        metadata_info={"target_lufs": request.target_lufs}
+        metadata_info={"target_lufs": request.target_lufs},
     )
     db.add(new_version)
     await db.commit()
@@ -147,7 +148,7 @@ async def get_audio_status(job_id: int, db: AsyncSession = Depends(get_db_sessio
         "progress": job.progress,
         "current_segment": job.current_segment,
         "total_segments": job.total_segments,
-        "error": job.error
+        "error": job.error,
     }
 
 

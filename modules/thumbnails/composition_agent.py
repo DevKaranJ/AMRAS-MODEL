@@ -17,9 +17,7 @@ class ThumbnailCompositionAgent:
     def __init__(self, config: Optional[Dict[str, Any]] = None) -> None:
         self.config = config or {}
 
-    async def generate_variants(
-        self, db: AsyncSession, thumbnail: Thumbnail, count: int = 5
-    ) -> List[ThumbnailVariant]:
+    async def generate_variants(self, db: AsyncSession, thumbnail: Thumbnail, count: int = 5) -> List[ThumbnailVariant]:
         """
         Generates Variants (A, B, C...) with different cropping, composition, focus.
         Persists variants to the database.

@@ -39,11 +39,7 @@ class AssetManagerAgent:
                 filepath = os.path.join(project_dir, filename)
                 if os.path.isfile(filepath):
                     size = os.path.getsize(filepath)
-                    assets.append({
-                        "filename": filename,
-                        "path": filepath,
-                        "size_bytes": size
-                    })
+                    assets.append({"filename": filename, "path": filepath, "size_bytes": size})
         logger.info(f"Retrieving {len(assets)} assets for project {project_id}.")
         return assets
 

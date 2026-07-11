@@ -10,28 +10,29 @@ from app.models.production import PipelineHistory
 
 logger = get_logger("amras.production.workflow")
 
+
 class PipelineStageConfig(BaseModel):
     stage_name: str
     dependencies: List[str] = []
+
 
 class WorkflowManagerAgent:
     """
     Workflow Manager Agent
     Responsibilities: Execute pipeline stages, monitor dependencies, retry failed stages, resume interrupted workflows.
     """
+
     def __init__(self) -> None:
         self.running_workflows: Dict[int, Any] = {}
 
-    async def execute_pipeline(self, job_id: int, stages: List[PipelineStageConfig], db: AsyncSession) -> Dict[str, Any]:
+    async def execute_pipeline(
+        self, job_id: int, stages: List[PipelineStageConfig], db: AsyncSession
+    ) -> Dict[str, Any]:
         """Executes the pipeline stages in dependency order and records history."""
         logger.info(f"Executing pipeline for job {job_id} with {len(stages)} stages.")
 
         for stage in stages:
-            history = PipelineHistory(
-                job_id=job_id,
-                stage=stage.stage_name,
-                status="queued"
-            )
+            history = PipelineHistory(job_id=job_id, stage=stage.stage_name, status="queued")
             db.add(history)
 
         await db.commit()
@@ -58,9 +59,7 @@ class WorkflowManagerAgent:
 
         # Update pipeline history status
         result = await db.execute(
-            select(PipelineHistory)
-            .where(PipelineHistory.job_id == job_id)
-            .where(PipelineHistory.status == "running")
+            select(PipelineHistory).where(PipelineHistory.job_id == job_id).where(PipelineHistory.status == "running")
         )
         for history in result.scalars():
             history.status = "paused"
@@ -111,9 +110,7 @@ class WorkflowManagerAgent:
 
         # Update pipeline history for the specific stage
         result = await db.execute(
-            select(PipelineHistory)
-            .where(PipelineHistory.job_id == job_id)
-            .where(PipelineHistory.stage == failed_stage)
+            select(PipelineHistory).where(PipelineHistory.job_id == job_id).where(PipelineHistory.stage == failed_stage)
         )
         history = result.scalar_one_or_none()
         if not history:
@@ -129,10 +126,7 @@ class WorkflowManagerAgent:
             self.running_workflows[job_id]["status"] = "running"
             self.running_workflows[job_id]["current_stage"] = failed_stage
         else:
-            self.running_workflows[job_id] = {
-                "status": "running",
-                "current_stage": failed_stage
-            }
+            self.running_workflows[job_id] = {"status": "running", "current_stage": failed_stage}
 
         return {"job_id": job_id, "status": "resumed", "current_stage": failed_stage}
 
@@ -144,16 +138,11 @@ class WorkflowManagerAgent:
         if job_id in self.running_workflows:
             self.running_workflows[job_id]["current_stage"] = stage_name
         else:
-            self.running_workflows[job_id] = {
-                "status": "running",
-                "current_stage": stage_name
-            }
+            self.running_workflows[job_id] = {"status": "running", "current_stage": stage_name}
 
         # Update pipeline history for the specific stage
         result = await db.execute(
-            select(PipelineHistory)
-            .where(PipelineHistory.job_id == job_id)
-            .where(PipelineHistory.stage == stage_name)
+            select(PipelineHistory).where(PipelineHistory.job_id == job_id).where(PipelineHistory.stage == stage_name)
         )
         history = result.scalar_one_or_none()
         if history:
@@ -161,11 +150,7 @@ class WorkflowManagerAgent:
             await db.commit()
         else:
             # Create new history entry if it doesn't exist
-            new_history = PipelineHistory(
-                job_id=job_id,
-                stage=stage_name,
-                status="retrying"
-            )
+            new_history = PipelineHistory(job_id=job_id, stage=stage_name, status="retrying")
             db.add(new_history)
             await db.commit()
 

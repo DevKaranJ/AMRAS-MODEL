@@ -12,23 +12,8 @@ class CameraDirectorAgent:
         emotion = panel_metadata.get("emotion")
 
         if is_battle:
-            return CameraPathCreate(
-                type="aggressive_zoom",
-                start_zoom=1.0,
-                end_zoom=1.5,
-                duration_ms=duration_ms
-            )
+            return CameraPathCreate(type="aggressive_zoom", start_zoom=1.0, end_zoom=1.5, duration_ms=duration_ms)
         elif emotion in ["sad", "dramatic"]:
-            return CameraPathCreate(
-                type="slow_zoom",
-                start_zoom=1.0,
-                end_zoom=1.2,
-                duration_ms=duration_ms
-            )
+            return CameraPathCreate(type="slow_zoom", start_zoom=1.0, end_zoom=1.2, duration_ms=duration_ms)
         else:
-            return CameraPathCreate(
-                type="static",
-                start_zoom=1.0,
-                end_zoom=1.0,
-                duration_ms=duration_ms
-            )
+            return CameraPathCreate(type="static", start_zoom=1.0, end_zoom=1.0, duration_ms=duration_ms)

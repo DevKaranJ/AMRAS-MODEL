@@ -89,7 +89,11 @@ class NarrationEngine:
 
             if fact_check_failed:
                 logger.warning("Script completed with fact-check warnings.")
-                return {"status": "completed_with_warnings", "script": assembled_script, "warnings": ["Fact check issues detected"]}
+                return {
+                    "status": "completed_with_warnings",
+                    "script": assembled_script,
+                    "warnings": ["Fact check issues detected"],
+                }
 
             logger.info("Script generation completed.")
             return {"status": "success", "script": assembled_script}

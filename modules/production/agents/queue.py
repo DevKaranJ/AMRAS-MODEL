@@ -24,7 +24,13 @@ class QueueManagerAgent:
     """
 
     def __init__(self) -> None:
-        self.queues: Dict[str, List[QueueItem]] = {"render": [], "ocr": [], "narration": [], "download": [], "publishing": []}
+        self.queues: Dict[str, List[QueueItem]] = {
+            "render": [],
+            "ocr": [],
+            "narration": [],
+            "download": [],
+            "publishing": [],
+        }
         self.is_running: Dict[str, bool] = {}
 
     async def enqueue(self, item: QueueItem) -> Dict[str, Any]:

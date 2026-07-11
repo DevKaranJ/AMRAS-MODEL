@@ -1,10 +1,11 @@
 from typing import AsyncGenerator
+
 import pytest
-from app.database.session import get_db_session
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.main import app
+from app.database.session import get_db_session
 
 
 @pytest.fixture

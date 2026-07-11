@@ -49,7 +49,9 @@ async def generate_subtitles(
                 await db.flush()
             except IntegrityError:
                 await db.rollback()
-                lang_res = await db.execute(select(SubtitleLanguage).where(SubtitleLanguage.code == request.language_code))
+                lang_res = await db.execute(
+                    select(SubtitleLanguage).where(SubtitleLanguage.code == request.language_code)
+                )
                 lang = lang_res.scalar_one_or_none()
                 if not lang:
                     raise

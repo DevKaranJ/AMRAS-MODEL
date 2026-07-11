@@ -1,19 +1,18 @@
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlalchemy import select
 
 from app.database.session import get_db_session
-from app.models.qa import QAReport, IssueReport, ValidationMetric, ApprovalHistory
+from app.models.qa import ApprovalHistory, IssueReport, QAReport, ValidationMetric
 from app.schemas.qa import (
-    QARunRequest,
+    AutoFixResult,
+    IssueReportResponse,
     QARepairRequest,
     QAReportResponse,
-    IssueReportResponse,
-    AutoFixResult,
-    ApprovalRequest,
+    QARunRequest,
     ValidationMetricResponse,
 )
 from modules.qa.engine import QAEngine

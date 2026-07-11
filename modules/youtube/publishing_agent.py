@@ -26,7 +26,7 @@ class PublishingAgent:
         # Use SELECT ... FOR UPDATE to lock the row during the check
         result = await db.execute(
             select(PublishingJob)
-            .where(PublishingJob.project_id == project_id, PublishingJob.status != 'published')
+            .where(PublishingJob.project_id == project_id, PublishingJob.status != "published")
             .with_for_update()
         )
         job = result.scalars().first()
@@ -40,8 +40,9 @@ class PublishingAgent:
                 # Another process created the job concurrently, re-query
                 await db.rollback()
                 result = await db.execute(
-                    select(PublishingJob)
-                    .where(PublishingJob.project_id == project_id, PublishingJob.status != 'published')
+                    select(PublishingJob).where(
+                        PublishingJob.project_id == project_id, PublishingJob.status != "published"
+                    )
                 )
                 job = result.scalars().first()
                 if not job:
@@ -96,7 +97,7 @@ class PublishingAgent:
                 youtube_video_id=video_id,
                 url=f"https://youtube.com/watch?v={video_id}",
                 status="active",
-                published_at=schedule_time or datetime.now(timezone.utc)
+                published_at=schedule_time or datetime.now(timezone.utc),
             )
             db.add(published_record)
             await db.flush()
