@@ -106,7 +106,6 @@ async def test_asset_manager_agent() -> None:
             os.remove("test_file.png")
 
 
-
 async def test_model_manager_agent(db_session: AsyncSession) -> None:
     agent = AIModelManagerAgent()
     res = await agent.allocate_gpu("test_model", 4000)

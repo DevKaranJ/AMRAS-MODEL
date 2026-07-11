@@ -28,7 +28,6 @@ def mock_db_session() -> AsyncMock:
     return db
 
 
-
 class TestTimelineService:
     @pytest.mark.asyncio
     async def test_generate_timeline_success(self, mock_db_session: AsyncMock) -> None:
