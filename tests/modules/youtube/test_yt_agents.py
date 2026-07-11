@@ -105,6 +105,7 @@ async def test_metadata_agent_video_metadata(mock_db_session: AsyncMock) -> None
     assert metadata.license == "standard"
 
 
+
 @pytest.mark.asyncio
 async def test_playlist_agent(mock_db_session: AsyncMock) -> None:
     from modules.youtube.playlist_agent import PlaylistAgent

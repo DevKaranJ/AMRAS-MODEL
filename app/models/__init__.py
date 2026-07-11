@@ -195,4 +195,27 @@ __all__ = [
     "StorageStatistics",
     "SystemHealth",
     "UserPreferences",
+    "Benchmarks",
+    "OptimizationHistory",
+    "PerformanceProfiles",
+    "ResourceUsage",
+    "CostReports",
+    "ModelBenchmarks",
+    "InferenceCache",
+    "DeploymentProfiles",
+    "ArchiveHistory",
+    "DependencyGraph",
 ]
+
+from app.models.optimization import (
+    ArchiveHistory,
+    Benchmarks,
+    CostReports,
+    DependencyGraph,
+    DeploymentProfiles,
+    InferenceCache,
+    ModelBenchmarks,
+    OptimizationHistory,
+    PerformanceProfiles,
+    ResourceUsage,
+)
