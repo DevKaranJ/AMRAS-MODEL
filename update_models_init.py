@@ -18,6 +18,7 @@ from app.models.optimization import (
 )
 """
 
-if "OptimizationHistory" not in content:
+# Check if the import block exists by looking for the from statement, not just any occurrence
+if "from app.models.optimization import" not in content:
     with open(file_path, "a") as f:
         f.write(new_imports)

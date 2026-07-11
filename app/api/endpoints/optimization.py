@@ -1,7 +1,7 @@
 # mypy: ignore-errors
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db_session
@@ -33,38 +33,18 @@ async def run_profile(payload: Dict[str, Any], db: AsyncSession = Depends(get_db
     return {"status": "success", "message": "Profiling complete", "results": {}}
 
 
-@router.post("/benchmark", response_model=BenchmarkResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/benchmark", response_model=BenchmarkResponse)
 async def run_benchmark(payload: BenchmarkCreate, db: AsyncSession = Depends(get_db_session)) -> Any:
     """Run a specific benchmark and store results."""
-    # Placeholder for benchmarking
-    return {
-        "id": 1,
-        "component": payload.component,
-        "operation": payload.operation,
-        "execution_time": payload.execution_time,
-        "memory_usage": payload.memory_usage,
-        "cpu_usage": payload.cpu_usage,
-        "gpu_usage": payload.gpu_usage,
-        "metadata_json": payload.metadata_json,
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
+    # TODO: Wire to benchmark storage and execution
+    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Benchmark execution not yet fully wired")
 
 
-@router.post("/archive", response_model=ArchiveHistoryResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/archive", response_model=ArchiveHistoryResponse)
 async def run_archive(payload: ArchiveHistoryCreate, db: AsyncSession = Depends(get_db_session)) -> Any:
     """Archive a project."""
-    # Placeholder for archiving
-    return {
-        "id": 1,
-        "project_id": payload.project_id,
-        "archive_path": payload.archive_path,
-        "size_mb": payload.size_mb,
-        "compression_ratio": payload.compression_ratio,
-        "status": "completed",
-        "created_at": "2024-01-01T00:00:00Z",
-        "updated_at": "2024-01-01T00:00:00Z",
-    }
+    # TODO: Wire to archiving storage and execution
+    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Archive execution not yet fully wired")
 
 
 @router.get("/performance", response_model=List[PerformanceProfileResponse], status_code=status.HTTP_200_OK)
