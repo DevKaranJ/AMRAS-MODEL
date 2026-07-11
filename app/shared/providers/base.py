@@ -113,7 +113,10 @@ class MockAIProvider(AIProviderInterface):
         return ["mocked_item"]
 
     def _generate_mock_object(self, schema: Dict[str, Any]) -> Dict[str, Any]:
-        return {}
+        mock_obj: Dict[str, Any] = {}
+        for k, v in schema.get("properties", {}).items():
+            mock_obj[k] = self._generate_mock_value(k, v)
+        return mock_obj
 
     async def generate_speech(
         self,

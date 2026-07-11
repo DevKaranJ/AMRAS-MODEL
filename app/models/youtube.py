@@ -86,7 +86,7 @@ class Playlist(Base, TimestampMixin):
     __tablename__ = "playlists"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    manga_id: Mapped[Optional[int]] = mapped_column(ForeignKey("mangas.id"), index=True)
+    manga_id: Mapped[Optional[int]] = mapped_column(ForeignKey("mangas.id"), index=True, unique=True)
     youtube_playlist_id: Mapped[Optional[str]] = mapped_column(String(100), unique=True)
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[Optional[str]] = mapped_column(Text)

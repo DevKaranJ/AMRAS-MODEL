@@ -14,3 +14,5 @@ async def db_session() -> AsyncSession:
     Session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     async with Session() as session:
         yield session
+
+    await engine.dispose()

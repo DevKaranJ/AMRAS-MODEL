@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock  # noqa: E402
+from unittest.mock import AsyncMock, Mock  # noqa: E402
 
 import pytest  # noqa: E402
 
@@ -6,6 +6,7 @@ import pytest  # noqa: E402
 @pytest.fixture
 def mock_db_session() -> AsyncMock:
     session = AsyncMock()
+    session.add = Mock()  # Make add() synchronous
     return session
 
 

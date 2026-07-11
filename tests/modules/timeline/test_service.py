@@ -34,12 +34,10 @@ class TestTimelineService:
         service = TimelineService(db=mock_db_session)
         request = TimelineGenerateRequest(project_id=1, settings={"test": True})
 
-        try:
-            result = await service.generate_timeline(request)
-            assert isinstance(result, dict)
-            assert result["project_id"] == 1
-        except Exception:
-            pass
+        result = await service.generate_timeline(request)
+        assert isinstance(result, dict)
+        assert result["project_id"] == 1
+        assert "status" in result
 
     @pytest.mark.asyncio
     async def test_get_timeline(self, mock_db_session: AsyncMock) -> None:
@@ -56,8 +54,6 @@ class TestTimelineService:
         service.qa_agent.audit_timeline.return_value = [{"issue": "test"}]
 
         request = TimelineGenerateRequest(project_id=2)
-        try:
-            result = await service.generate_timeline(request)
-            assert result["project_id"] == 2
-        except Exception:
-            pass
+        result = await service.generate_timeline(request)
+        assert result["project_id"] == 2
+        assert "status" in result

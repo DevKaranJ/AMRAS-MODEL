@@ -87,23 +87,18 @@ async def test_queue_manager_agent() -> None:
 import tempfile  # noqa: E402
 
 
-async def test_asset_manager_agent() -> None:
-    import os
+async def test_asset_manager_agent(tmp_path: pytest.TempPath) -> None:  # type: ignore[name-defined]
+    # Create test file in temporary directory
+    test_file_path = tmp_path / "test_file.png"
+    test_file_path.write_text("dummy")
 
-    with open("test_file.png", "w") as tf:
-        tf.write("dummy")
-    try:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            agent = AssetManagerAgent(base_storage_path=tmpdir)
-            res = await agent.register_asset(1, "image", "test_file.png")
-            assert res["status"] == "registered"
+    agent = AssetManagerAgent(base_storage_path=str(tmp_path))
+    res = await agent.register_asset(1, "image", str(test_file_path))
+    assert res["status"] == "registered"
 
-            assets = await agent.get_project_assets(1)
-            assert len(assets) == 1
-            assert assets[0]["filename"] == "test_file.png"
-    finally:
-        if os.path.exists("test_file.png"):
-            os.remove("test_file.png")
+    assets = await agent.get_project_assets(1)
+    assert len(assets) == 1
+    assert assets[0]["filename"] == "test_file.png"
 
 
 async def test_model_manager_agent(db_session: AsyncSession) -> None:
