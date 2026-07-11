@@ -82,41 +82,38 @@ class MockAIProvider(AIProviderInterface):
         if response_format:
             import json
 
-            # Mock response generator based on schema types
-            mock_resp: Dict[str, Any] = {}
-            for k, v in response_format.get("properties", {}).items():
-                prop_type = v.get("type", "string")
-                if prop_type == "array":
-                    # Generate a mock array with one item matching the items schema
-                    items_schema = v.get("items", {})
-                    if items_schema.get("type") == "object":
-                        # Create a mock object based on items properties
-                        mock_item: Dict[str, Any] = {}
-                        for item_k, item_v in items_schema.get("properties", {}).items():
-                            item_type = item_v.get("type", "string")
-                            if item_type == "integer":
-                                mock_item[item_k] = 1
-                            elif item_type == "number":
-                                mock_item[item_k] = 1.0
-                            elif item_type == "boolean":
-                                mock_item[item_k] = True
-                            else:
-                                mock_item[item_k] = f"mocked_{item_k}"
-                        mock_resp[k] = [mock_item]
-                    else:
-                        mock_resp[k] = ["mocked_item"]
-                elif prop_type == "object":
-                    mock_resp[k] = {}
-                elif prop_type == "integer":
-                    mock_resp[k] = 1
-                elif prop_type == "number":
-                    mock_resp[k] = 1.0
-                elif prop_type == "boolean":
-                    mock_resp[k] = True
-                else:
-                    mock_resp[k] = "mocked_" + k
-            return json.dumps(mock_resp)
+            return json.dumps(self._generate_mock_from_schema(response_format))
         return "This is a mock AI response to: " + prompt[:20]
+
+    def _generate_mock_from_schema(self, schema: Dict[str, Any]) -> Dict[str, Any]:
+        mock_resp: Dict[str, Any] = {}
+        for k, v in schema.get("properties", {}).items():
+            mock_resp[k] = self._generate_mock_value(k, v)
+        return mock_resp
+
+    def _generate_mock_value(self, key: str, schema: Dict[str, Any]) -> Any:
+        prop_type = schema.get("type", "string")
+        if prop_type == "array":
+            return self._generate_mock_array(schema)
+        elif prop_type == "object":
+            return self._generate_mock_object(schema)
+        elif prop_type == "integer":
+            return 1
+        elif prop_type == "number":
+            return 1.0
+        elif prop_type == "boolean":
+            return True
+        else:
+            return f"mocked_{key}"
+
+    def _generate_mock_array(self, schema: Dict[str, Any]) -> list[Any]:
+        items_schema = schema.get("items", {})
+        if items_schema.get("type") == "object":
+            return [self._generate_mock_from_schema(items_schema)]
+        return ["mocked_item"]
+
+    def _generate_mock_object(self, schema: Dict[str, Any]) -> Dict[str, Any]:
+        return {}
 
     async def generate_speech(
         self,

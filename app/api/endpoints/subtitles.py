@@ -7,8 +7,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db_session
-
-logger = logging.getLogger(__name__)
 from app.models.subtitles import (
     CaptionStyle,
     SubtitleJob,
@@ -27,6 +25,7 @@ from app.schemas.subtitles import (
 )
 from modules.subtitles.engine import SubtitleEngine
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -49,7 +48,9 @@ async def generate_subtitles(
                 await db.flush()
             except IntegrityError:
                 await db.rollback()
-                lang_res = await db.execute(select(SubtitleLanguage).where(SubtitleLanguage.code == request.language_code))
+                lang_res = await db.execute(
+                    select(SubtitleLanguage).where(SubtitleLanguage.code == request.language_code)
+                )
                 lang = lang_res.scalar_one_or_none()
                 if not lang:
                     raise

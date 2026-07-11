@@ -65,9 +65,7 @@ class SEOAgent:
         desc_parts.append("#anime #manga #recap")
         desc_parts.append("Disclaimer: This is a fan-made recap.")
 
-        description = Description(
-            profile_id=profile_id, text="\n\n".join(desc_parts), has_chapters=bool(timestamps)
-        )
+        description = Description(profile_id=profile_id, text="\n\n".join(desc_parts), has_chapters=bool(timestamps))
         db.add(description)
         await db.flush()
         return description

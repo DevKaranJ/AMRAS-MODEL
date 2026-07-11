@@ -22,7 +22,4 @@ class CompositionAgent:
 
     async def execute(self, input_data: CompositionInput) -> CompositionOutput:
         # Mock implementation
-        return CompositionOutput(
-            status="success",
-            composed_frame_data={"layers": len(input_data.panel_paths)}
-        )
+        return CompositionOutput(status="success", composed_frame_data={"layers": len(input_data.panel_paths)})

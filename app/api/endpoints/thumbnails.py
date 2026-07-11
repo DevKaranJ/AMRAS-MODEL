@@ -17,8 +17,7 @@ async def generate_thumbnails(request: GenerateThumbnailRequest) -> Any:
     # Should use request.number_of_variants, request.style, etc.
     # to delegate to thumbnail agents (PlanningAgent, CompositionAgent)
     raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Thumbnail generation pipeline not yet implemented"
+        status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Thumbnail generation pipeline not yet implemented"
     )
 
 
@@ -29,7 +28,4 @@ async def list_thumbnails(project_id: int) -> Any:
     """
     # TODO: Query database for thumbnails by project_id
     # Should query Thumbnail model and related variants from persistence layer
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Thumbnail listing not yet implemented"
-    )
+    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Thumbnail listing not yet implemented")

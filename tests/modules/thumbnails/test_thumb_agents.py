@@ -1,6 +1,6 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock  # noqa: E402
 
-import pytest
+import pytest  # noqa: E402
 
 
 @pytest.fixture
@@ -8,10 +8,11 @@ def mock_db_session() -> AsyncMock:
     session = AsyncMock()
     return session
 
-from app.models.timeline import TimelineScene
-from app.models.youtube import Thumbnail
-from modules.thumbnails.composition_agent import ThumbnailCompositionAgent
-from modules.thumbnails.planning_agent import ThumbnailPlanningAgent
+
+from app.models.timeline import TimelineScene  # noqa: E402
+from app.models.youtube import Thumbnail  # noqa: E402
+from modules.thumbnails.composition_agent import ThumbnailCompositionAgent  # noqa: E402
+from modules.thumbnails.planning_agent import ThumbnailPlanningAgent  # noqa: E402
 
 
 @pytest.mark.asyncio
@@ -20,35 +21,35 @@ async def test_thumbnail_planning_agent(mock_db_session: AsyncMock) -> None:
     timeline_id = 999
     job_id = 1
 
-
     # Mock some scenes
     mock_scenes = []
     for i in range(10):
-        mock_scenes.append(TimelineScene(
-            id=i+1,
-            timeline_id=timeline_id,
-            sequence_number=i,
-            start_time_ms=i * 1000,
-            end_time_ms=(i + 1) * 1000,
-            duration_ms=1000 * (i + 1),
-        ))
+        mock_scenes.append(
+            TimelineScene(
+                id=i + 1,
+                timeline_id=timeline_id,
+                sequence_number=i,
+                start_time_ms=i * 1000,
+                end_time_ms=(i + 1) * 1000,
+                duration_ms=1000 * (i + 1),
+            )
+        )
 
     from unittest.mock import MagicMock
+
     mock_result = MagicMock()
     mock_result.scalars.return_value.all.return_value = mock_scenes
     mock_db_session.execute.return_value = mock_result
 
     # Skip actual creation
     for i in range(10):
-        scene = TimelineScene(
+        TimelineScene(
             timeline_id=timeline_id,
             sequence_number=i,
             start_time_ms=i * 1000,
             end_time_ms=(i + 1) * 1000,
-            duration_ms=1000 * (i + 1), # Variable duration for scoring
+            duration_ms=1000 * (i + 1),  # Variable duration for scoring
         )
-
-
 
     agent = ThumbnailPlanningAgent()
 
@@ -59,6 +60,7 @@ async def test_thumbnail_planning_agent(mock_db_session: AsyncMock) -> None:
     assert concepts[0].score == 10.0
     assert concepts[0].job_id == job_id
     mock_db_session.add.assert_called()  # Flushed to DB
+
 
 @pytest.mark.asyncio
 async def test_thumbnail_composition_agent(mock_db_session: AsyncMock) -> None:

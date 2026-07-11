@@ -13,7 +13,7 @@ class TestAgents:
         agent = TimelinePlanningAgent()
         timeline = agent.create_initial_timeline(project_id=1, settings={})
         assert timeline.project_id == 1
-        scenes = agent.plan_scenes([{"id": 1}], [{"id": 10}])
+        scenes = agent.plan_scenes(1, [{"id": 1}], [{"id": 10}])
         assert len(scenes) == 1
 
     def test_panel_selection_agent(self) -> None:
@@ -41,7 +41,9 @@ class TestAgents:
 
     def test_audio_sync_agent(self) -> None:
         agent = AudioSynchronizationAgent()
-        syncs = agent.synchronize([{"id": 1, "start_time_ms": 0, "end_time_ms": 500, "duration_ms": 500}], [{"id": 1, "duration_ms": 1000}])
+        syncs = agent.synchronize(
+            [{"id": 1, "start_time_ms": 0, "end_time_ms": 500, "duration_ms": 500}], [{"id": 1, "duration_ms": 1000}]
+        )
         assert len(syncs) == 1
         assert syncs[0].end_time_ms == 1000
 

@@ -18,6 +18,7 @@ async def test_render_manager_agent() -> None:
     assert result.status == "queued"
     assert result.job_id == 1
 
+
 @pytest.mark.asyncio
 async def test_scene_renderer_agent() -> None:
     agent = SceneRendererAgent()
@@ -26,12 +27,16 @@ async def test_scene_renderer_agent() -> None:
     assert result.status == "completed"
     assert result.scene_id == 1
 
+
 @pytest.mark.asyncio
 async def test_transition_agent() -> None:
     agent = TransitionAgent()
-    input_data = TransitionInput(transition_type="crossfade", scene_a_path="a.mp4", scene_b_path="b.mp4", duration_ms=1000)
+    input_data = TransitionInput(
+        transition_type="crossfade", scene_a_path="a.mp4", scene_b_path="b.mp4", duration_ms=1000
+    )
     result = await agent.execute(input_data)
     assert result.status == "completed"
+
 
 @pytest.mark.asyncio
 async def test_animation_agent() -> None:
@@ -40,6 +45,7 @@ async def test_animation_agent() -> None:
     result = await agent.execute(input_data)
     assert result.status == "success"
 
+
 @pytest.mark.asyncio
 async def test_composition_agent() -> None:
     agent = CompositionAgent()
@@ -47,18 +53,23 @@ async def test_composition_agent() -> None:
     result = await agent.execute(input_data)
     assert result.status == "success"
 
+
 @pytest.mark.asyncio
 async def test_encoding_agent() -> None:
     agent = EncodingAgent()
-    input_data = EncodingInput(input_path="in.mp4", output_path="out.mp4", codec="H.264", format="mp4", resolution="1080p", fps=60)
+    input_data = EncodingInput(
+        input_path="in.mp4", output_path="out.mp4", codec="H.264", format="mp4", resolution="1080p", fps=60
+    )
     result = await agent.execute(input_data)
     assert result.status == "completed"
+
 
 @pytest.mark.asyncio
 async def test_resource_manager_agent() -> None:
     agent = ResourceManagementAgent()
     status = await agent.get_system_status()
     assert status.cpu_usage_percent >= 0.0
+
 
 @pytest.mark.asyncio
 async def test_qa_agent() -> None:

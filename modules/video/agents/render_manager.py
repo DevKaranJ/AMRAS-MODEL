@@ -28,31 +28,22 @@ class RenderManagerAgent:
         # Mock implementation for skeleton
         if input_data.action == "start":
             return RenderManagerOutput(
-                job_id=input_data.job_id,
-                status="queued",
-                progress=0.0,
-                message="Render job queued successfully."
+                job_id=input_data.job_id, status="queued", progress=0.0, message="Render job queued successfully."
             )
         elif input_data.action == "resume":
             return RenderManagerOutput(
                 job_id=input_data.job_id,
                 status="resuming",
                 progress=50.0,
-                message="Resuming from last successful scene."
+                message="Resuming from last successful scene.",
             )
         elif input_data.action == "cancel":
             return RenderManagerOutput(
-                job_id=input_data.job_id,
-                status="cancelled",
-                progress=10.0,
-                message="Render job cancelled."
+                job_id=input_data.job_id, status="cancelled", progress=10.0, message="Render job cancelled."
             )
         elif input_data.action == "status":
             return RenderManagerOutput(
-                job_id=input_data.job_id,
-                status="rendering",
-                progress=45.5,
-                message="Rendering in progress."
+                job_id=input_data.job_id, status="rendering", progress=45.5, message="Rendering in progress."
             )
         else:
             raise InvalidRenderActionError(action=input_data.action)

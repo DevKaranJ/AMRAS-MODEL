@@ -31,7 +31,7 @@ class AIModelManagerAgent:
                 "provider": m.provider,
                 "status": m.status,
                 "path": m.path,
-                "memory_usage_mb": m.memory_usage_mb
+                "memory_usage_mb": m.memory_usage_mb,
             }
             for m in models
         ]
@@ -45,12 +45,7 @@ class AIModelManagerAgent:
         """Downloads and installs a local AI model."""
         try:
             # Try to insert new model first (optimistic approach)
-            model = InstalledModels(
-                name=model_name,
-                provider="local",
-                status="installed",
-                path=source_url
-            )
+            model = InstalledModels(name=model_name, provider="local", status="installed", path=source_url)
             db.add(model)
             await db.commit()
             logger.info(f"Installing model {model_name} from {source_url}.")

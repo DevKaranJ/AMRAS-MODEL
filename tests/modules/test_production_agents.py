@@ -1,22 +1,22 @@
-import pytest
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+import pytest  # noqa: E402
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine  # noqa: E402
 
-from app.models.base import Base
-from app.models.core import Job
-from modules.production.agents.asset import AssetManagerAgent
-from modules.production.agents.model import AIModelManagerAgent
-from modules.production.agents.qa import QAAgent
-from modules.production.agents.queue import QueueItem, QueueManagerAgent
-from modules.production.agents.recovery import RecoveryAgent
-from modules.production.agents.settings import SettingsAgent
-from modules.production.agents.workflow import PipelineStageConfig, WorkflowManagerAgent
+from app.models.base import Base  # noqa: E402
+from app.models.core import Job  # noqa: E402
+from modules.production.agents.asset import AssetManagerAgent  # noqa: E402
+from modules.production.agents.model import AIModelManagerAgent  # noqa: E402
+from modules.production.agents.qa import QAAgent  # noqa: E402
+from modules.production.agents.queue import QueueItem, QueueManagerAgent  # noqa: E402
+from modules.production.agents.recovery import RecoveryAgent  # noqa: E402
+from modules.production.agents.settings import SettingsAgent  # noqa: E402
+from modules.production.agents.workflow import PipelineStageConfig, WorkflowManagerAgent  # noqa: E402
 
 pytestmark = pytest.mark.asyncio
 
 engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
 TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
 
-from typing import AsyncGenerator
+from typing import AsyncGenerator  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
@@ -27,16 +27,18 @@ async def setup_db() -> AsyncGenerator[None, None]:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
+
 @pytest.fixture
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
     async with TestingSessionLocal() as session:
         yield session
 
+
 async def test_workflow_manager_agent(db_session: AsyncSession) -> None:
     # Setup dummy job
     job = Job(name="test_job", status="queued")
     db_session.add(job)
-    await db_session.flush() # Ensure ID is generated without detaching/expiring
+    await db_session.flush()  # Ensure ID is generated without detaching/expiring
     job_id = job.id
 
     agent = WorkflowManagerAgent()
@@ -63,6 +65,7 @@ async def test_workflow_manager_agent(db_session: AsyncSession) -> None:
     assert retry_res["status"] == "retrying"
     assert retry_res["job_id"] == job_id
 
+
 async def test_queue_manager_agent() -> None:
     agent = QueueManagerAgent()
     item = QueueItem(job_id=1, project_id=1, queue_name="render")
@@ -80,18 +83,28 @@ async def test_queue_manager_agent() -> None:
     q_status = await agent.get_queue_status("render")
     assert q_status[0].priority == 10
 
-import tempfile
+
+import tempfile  # noqa: E402
 
 
 async def test_asset_manager_agent() -> None:
-    with tempfile.TemporaryDirectory() as tmpdir:
-        agent = AssetManagerAgent(base_storage_path=tmpdir)
-        res = await agent.register_asset(1, "image", "test_file.png")
-        assert res["status"] == "registered"
+    import os
 
-        assets = await agent.get_project_assets(1)
-        assert len(assets) == 1
-        assert assets[0]["filename"] == "test_file.png"
+    with open("test_file.png", "w") as tf:
+        tf.write("dummy")
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            agent = AssetManagerAgent(base_storage_path=tmpdir)
+            res = await agent.register_asset(1, "image", "test_file.png")
+            assert res["status"] == "registered"
+
+            assets = await agent.get_project_assets(1)
+            assert len(assets) == 1
+            assert assets[0]["filename"] == "test_file.png"
+    finally:
+        if os.path.exists("test_file.png"):
+            os.remove("test_file.png")
+
 
 async def test_model_manager_agent(db_session: AsyncSession) -> None:
     agent = AIModelManagerAgent()
@@ -104,6 +117,7 @@ async def test_model_manager_agent(db_session: AsyncSession) -> None:
     assert len(models) == 1
     assert models[0]["name"] == "test_local"
 
+
 async def test_settings_agent() -> None:
     agent = SettingsAgent()
     settings = await agent.get_global_settings()
@@ -111,12 +125,14 @@ async def test_settings_agent() -> None:
     updated = await agent.update_global_settings({"theme": "dark"})
     assert updated["theme"] == "dark"
 
+
 async def test_recovery_agent() -> None:
     agent = RecoveryAgent()
     res = await agent.scan_for_interrupted_jobs()
     assert res["found"] == 0
     valid = await agent.verify_cache_integrity()
     assert valid is True
+
 
 async def test_qa_agent() -> None:
     agent = QAAgent()
@@ -126,6 +142,7 @@ async def test_qa_agent() -> None:
     assert len(errors2) == 0
     valid = await agent.verify_output_assets(1)
     assert valid is True
+
 
 async def test_queue_manager_agent_priority() -> None:
     agent = QueueManagerAgent()
@@ -138,6 +155,7 @@ async def test_queue_manager_agent_priority() -> None:
     assert item is not None
     assert item.job_id == 2
     assert item.status == "running"
+
 
 async def test_queue_manager_agent_requeue() -> None:
     agent = QueueManagerAgent()

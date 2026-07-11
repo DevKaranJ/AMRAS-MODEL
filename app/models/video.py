@@ -22,6 +22,7 @@ class EncodingProfile(Base, TimestampMixin):
     is_default: Mapped[bool] = mapped_column(Boolean, default=False)
     config: Mapped[Dict[str, Any]] = mapped_column(MutableDict.as_mutable(JSON), default=dict)
 
+
 class RenderJob(Base, TimestampMixin):
     __tablename__ = "render_jobs"
 
@@ -34,6 +35,7 @@ class RenderJob(Base, TimestampMixin):
     error_message: Mapped[Optional[str]] = mapped_column(Text)
     config: Mapped[Dict[str, Any]] = mapped_column(MutableDict.as_mutable(JSON), default=dict)
 
+
 class RenderScene(Base, TimestampMixin):
     __tablename__ = "render_scenes"
 
@@ -44,6 +46,7 @@ class RenderScene(Base, TimestampMixin):
     output_path: Mapped[Optional[str]] = mapped_column(String(1024))
     render_time_ms: Mapped[int] = mapped_column(Integer, default=0)
     error_message: Mapped[Optional[str]] = mapped_column(Text)
+
 
 class EncodedVideo(Base, TimestampMixin):
     __tablename__ = "encoded_videos"
@@ -56,6 +59,7 @@ class EncodedVideo(Base, TimestampMixin):
     duration_ms: Mapped[int] = mapped_column(Integer)
     checksum: Mapped[Optional[str]] = mapped_column(String(255))
     metadata_info: Mapped[Dict[str, Any]] = mapped_column(MutableDict.as_mutable(JSON), default=dict)
+
 
 class RenderReport(Base, TimestampMixin):
     __tablename__ = "render_reports"
@@ -70,6 +74,7 @@ class RenderReport(Base, TimestampMixin):
     warnings: Mapped[Dict[str, Any]] = mapped_column(MutableDict.as_mutable(JSON), default=dict)
     errors: Mapped[Dict[str, Any]] = mapped_column(MutableDict.as_mutable(JSON), default=dict)
 
+
 class OutputFile(Base, TimestampMixin):
     __tablename__ = "output_files"
 
@@ -79,12 +84,13 @@ class OutputFile(Base, TimestampMixin):
     file_path: Mapped[str] = mapped_column(String(1024))
     size_bytes: Mapped[int] = mapped_column(Integer)
 
+
 class RenderStatistic(Base, TimestampMixin):
     __tablename__ = "render_statistics"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     job_id: Mapped[int] = mapped_column(ForeignKey("render_jobs.id"), index=True)
-    timestamp: Mapped[int] = mapped_column(Integer) # Unix timestamp
+    timestamp: Mapped[int] = mapped_column(Integer)  # Unix timestamp
     cpu_usage: Mapped[float] = mapped_column(Float, default=0.0)
     gpu_usage: Mapped[float] = mapped_column(Float, default=0.0)
     ram_usage_mb: Mapped[float] = mapped_column(Float, default=0.0)
