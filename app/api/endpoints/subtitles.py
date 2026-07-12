@@ -7,8 +7,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database.session import get_db_session
-
-logger = logging.getLogger(__name__)
 from app.models.subtitles import (
     CaptionStyle,
     SubtitleJob,
@@ -27,6 +25,7 @@ from app.schemas.subtitles import (
 )
 from modules.subtitles.engine import SubtitleEngine
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 

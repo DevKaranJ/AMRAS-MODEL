@@ -23,7 +23,7 @@ class AnalyticsAgent:
 
         # Check for existing profile first to avoid duplicate inserts
         result = await db.execute(select(AnalyticsProfile).where(AnalyticsProfile.job_id == job_id))
-        existing_profile = result.scalars().first()
+        existing_profile = result.scalar_one_or_none()
 
         if existing_profile:
             logger.info(f"Found existing analytics profile for job {job_id}")

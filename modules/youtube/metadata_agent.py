@@ -63,7 +63,7 @@ class MetadataAgent:
 
         # Check for existing metadata first to avoid duplicate inserts
         result = await db.execute(select(VideoMetadata).where(VideoMetadata.job_id == job_id))
-        existing_metadata = result.scalars().first()
+        existing_metadata = result.scalar_one_or_none()
 
         if existing_metadata:
             logger.info(f"Found existing video metadata for job {job_id}")

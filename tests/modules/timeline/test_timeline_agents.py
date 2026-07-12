@@ -13,7 +13,7 @@ class TestAgents:
         agent = TimelinePlanningAgent()
         timeline = agent.create_initial_timeline(project_id=1, settings={})
         assert timeline.project_id == 1
-        scenes = agent.plan_scenes([{"id": 1}], [{"id": 10}])
+        scenes = agent.plan_scenes(1, [{"id": 1}], [{"id": 10}])
         assert len(scenes) == 1
 
     def test_panel_selection_agent(self) -> None:

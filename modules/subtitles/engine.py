@@ -130,8 +130,6 @@ class SubtitleEngine:
                 await db.close()
 
     async def translate_subtitles(self, translation_job_id: int) -> None:
-        from modules.subtitles.agents import FormattingAgent, LocalizationAgent, TranslationAgent
-
         db = await self.get_db()
         t_job = await self.get_translation_job(translation_job_id)
         if not t_job:
@@ -143,94 +141,16 @@ class SubtitleEngine:
         await db.commit()
 
         try:
-            # Fetch source segments
-            result = await db.execute(
-                select(SubtitleSegment)
-                .where(SubtitleSegment.subtitle_job_id == t_job.subtitle_job_id)
-                .order_by(SubtitleSegment.sequence_number)
-            )
-            source_segments = result.scalars().all()
+            source_segments = await self._fetch_source_segments(db, t_job.subtitle_job_id)
+            target_lang = await self._fetch_target_language(db, t_job.target_language_id)
 
-            if not source_segments:
-                raise SubtitleEngineError("No source segments found for translation.")
+            translated_segs = await self._execute_translation_pipeline(db, t_job, source_segments, target_lang)
 
-            # Get target language name
-            lang_result = await db.execute(
-                select(SubtitleLanguage).where(SubtitleLanguage.id == t_job.target_language_id)
-            )
-            target_lang = lang_result.scalar_one_or_none()
-            if not target_lang:
-                raise SubtitleEngineError("Target language not found.")
+            await self._save_translated_segments(db, t_job, source_segments, translated_segs)
 
-            trans_agent = TranslationAgent()
-            local_agent = LocalizationAgent()
-            form_agent = FormattingAgent()
-
-            segs_dict = [{"text": s.text} for s in source_segments]
-
-            # Translation
-            t_payload = {"segments": segs_dict, "target_language": target_lang.name}
-            t_result = await trans_agent.execute(t_payload)
-            translated_segs = t_result.get("translated_segments", [])
-
-            # Localization
-            if t_job.localization_profile_id:
-                profile_result = await db.execute(
-                    select(LocalizationProfile).where(LocalizationProfile.id == t_job.localization_profile_id)
-                )
-                profile = profile_result.scalar_one_or_none()
-                if profile:
-                    profile_dict = {
-                        "id": profile.id,
-                        "name": profile.name,
-                        "honorifics_strategy": profile.honorifics_strategy,
-                        "measurements_strategy": profile.measurements_strategy,
-                        "currency_strategy": profile.currency_strategy,
-                        "rules": profile.rules,
-                    }
-                    l_payload = {"segments": translated_segs, "profile": profile_dict}
-                    l_result = await local_agent.execute(l_payload)
-                    translated_segs = l_result.get("localized_segments", translated_segs)
-
-            # Formatting
-            f_payload = {"segments": translated_segs, "settings": {"max_lines": 2, "max_characters_per_line": 42}}
-            f_result = await form_agent.execute(f_payload)
-            final_segs = f_result.get("formatted_segments", translated_segs)
-
-            # Create a new SubtitleJob for the translated version to hold the new segments
-            if not t_job.subtitle_job:
-                raise SubtitleEngineError("Translation job has no associated subtitle job")
-            new_job = SubtitleJob(
-                project_id=t_job.subtitle_job.project_id,
-                timeline_id=t_job.subtitle_job.timeline_id,
-                language_id=t_job.target_language_id,
-                status="completed",
-                progress=100.0,
-            )
-            db.add(new_job)
-            await db.flush()
-
-            # Save translated segments
-            db_segments = []
-            for i, src_seg in enumerate(source_segments):
-                text = final_segs[i].get("text", "") if i < len(final_segs) else src_seg.text
-                db_seg = SubtitleSegment(
-                    subtitle_job_id=new_job.id,
-                    sequence_number=src_seg.sequence_number,
-                    start_time_ms=src_seg.start_time_ms,
-                    end_time_ms=src_seg.end_time_ms,
-                    duration_ms=src_seg.duration_ms,
-                    text=text,
-                    speaker=src_seg.speaker,
-                    confidence=1.0,
-                )
-                db_segments.append(db_seg)
-
-            db.add_all(db_segments)
             t_job.status = "completed"
             t_job.progress = 100.0
             await db.commit()
-
         except Exception as e:
             t_job.status = "failed"
             t_job.error_message = str(e)
@@ -239,3 +159,111 @@ class SubtitleEngine:
         finally:
             if not self._db_session:
                 await db.close()
+
+    async def _fetch_source_segments(self, db: AsyncSession, subtitle_job_id: int) -> List[SubtitleSegment]:
+        result = await db.execute(
+            select(SubtitleSegment)
+            .where(SubtitleSegment.subtitle_job_id == subtitle_job_id)
+            .order_by(SubtitleSegment.sequence_number)
+        )
+        source_segments = result.scalars().all()
+        if not source_segments:
+            raise SubtitleEngineError("No source segments found for translation.")
+        return list(source_segments)
+
+    async def _fetch_target_language(self, db: AsyncSession, target_language_id: int) -> SubtitleLanguage:
+        lang_result = await db.execute(select(SubtitleLanguage).where(SubtitleLanguage.id == target_language_id))
+        target_lang = lang_result.scalar_one_or_none()
+        if not target_lang:
+            raise SubtitleEngineError("Target language not found.")
+        return target_lang
+
+    async def _execute_translation_pipeline(
+        self,
+        db: AsyncSession,
+        t_job: TranslationJob,
+        source_segments: List[SubtitleSegment],
+        target_lang: SubtitleLanguage,
+    ) -> List[Dict[str, Any]]:
+        from modules.subtitles.agents import FormattingAgent, LocalizationAgent, TranslationAgent
+
+        trans_agent = TranslationAgent()
+        local_agent = LocalizationAgent()
+        form_agent = FormattingAgent()
+
+        segs_dict = [{"text": s.text} for s in source_segments]
+
+        # Translation
+        t_payload = {"segments": segs_dict, "target_language": target_lang.name}
+        t_result = await trans_agent.execute(t_payload)
+        translated_segs = t_result.get("translated_segments", [])
+
+        # Localization
+        translated_segs = await self._apply_localization(db, t_job, local_agent, translated_segs)
+
+        # Formatting
+        f_payload = {"segments": translated_segs, "settings": {"max_lines": 2, "max_characters_per_line": 42}}
+        f_result = await form_agent.execute(f_payload)
+        result: List[Dict[str, Any]] = f_result.get("formatted_segments", translated_segs)
+        return result
+
+    async def _apply_localization(
+        self, db: AsyncSession, t_job: TranslationJob, local_agent: Any, translated_segs: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
+        if not t_job.localization_profile_id:
+            return translated_segs
+
+        profile_result = await db.execute(
+            select(LocalizationProfile).where(LocalizationProfile.id == t_job.localization_profile_id)
+        )
+        profile = profile_result.scalar_one_or_none()
+        if profile:
+            profile_dict = {
+                "id": profile.id,
+                "name": profile.name,
+                "honorifics_strategy": profile.honorifics_strategy,
+                "measurements_strategy": profile.measurements_strategy,
+                "currency_strategy": profile.currency_strategy,
+                "rules": profile.rules,
+            }
+            l_payload = {"segments": translated_segs, "profile": profile_dict}
+            l_result = await local_agent.execute(l_payload)
+            result: List[Dict[str, Any]] = l_result.get("localized_segments", translated_segs)
+            return result
+        return translated_segs
+
+    async def _save_translated_segments(
+        self,
+        db: AsyncSession,
+        t_job: TranslationJob,
+        source_segments: List[SubtitleSegment],
+        final_segs: List[Dict[str, Any]],
+    ) -> None:
+        if not t_job.subtitle_job:
+            raise SubtitleEngineError("Translation job has no associated subtitle job")
+        new_job = SubtitleJob(
+            project_id=t_job.subtitle_job.project_id,
+            timeline_id=t_job.subtitle_job.timeline_id,
+            language_id=t_job.target_language_id,
+            status="completed",
+            progress=100.0,
+        )
+        db.add(new_job)
+        await db.flush()
+
+        db_segments = []
+        for i, src_seg in enumerate(source_segments):
+            text = final_segs[i].get("text", "") if i < len(final_segs) else src_seg.text
+            db_seg = SubtitleSegment(
+                subtitle_job_id=new_job.id,
+                sequence_number=src_seg.sequence_number,
+                start_time_ms=src_seg.start_time_ms,
+                end_time_ms=src_seg.end_time_ms,
+                duration_ms=src_seg.duration_ms,
+                text=text,
+                speaker=src_seg.speaker,
+                confidence=1.0,
+            )
+            db_segments.append(db_seg)
+
+        db.add_all(db_segments)

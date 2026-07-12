@@ -22,7 +22,7 @@ class PlaylistAgent:
         logger.info(f"Looking up or creating playlist for manga {manga_id}: {series_title}")
 
         result = await db.execute(select(Playlist).where(Playlist.manga_id == manga_id))
-        playlist = result.scalars().first()
+        playlist = result.scalar_one_or_none()
 
         if playlist:
             logger.info(f"Found existing playlist: {playlist.youtube_playlist_id}")

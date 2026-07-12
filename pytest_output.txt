@@ -1,0 +1,354 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.13, pytest-9.1.1, pluggy-1.6.0
+rootdir: /app
+configfile: pytest.ini
+plugins: cov-7.1.0, anyio-4.14.1, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 230 items
+
+tests/api/test_production.py ..............                              [  6%]
+tests/api/test_qa_endpoints.py .........                                 [ 10%]
+tests/api/test_story_endpoints.py ........                               [ 13%]
+tests/api/test_subtitles_endpoints.py ....                               [ 15%]
+tests/api/test_timeline.py ........                                      [ 18%]
+tests/api/test_video.py .......                                          [ 21%]
+tests/api/test_vision_endpoints.py .......                               [ 24%]
+tests/api/test_voice_api.py ...                                          [ 26%]
+tests/app/api/endpoints/test_youtube.py ...                              [ 27%]
+tests/modules/ingestion/test_importers.py ....                           [ 29%]
+tests/modules/ingestion/test_ingestion_agents.py ...                     [ 30%]
+tests/modules/ingestion/test_pipeline.py .                               [ 30%]
+tests/modules/narration/test_narration_agents.py .........               [ 34%]
+tests/modules/narration/test_narration_engine.py ...                     [ 36%]
+tests/modules/narration/test_narration_exceptions.py ........            [ 39%]
+tests/modules/ocr/test_ocr_agents.py ..                                  [ 40%]
+tests/modules/ocr/test_ocr_pipeline.py .                                 [ 40%]
+tests/modules/story/test_agents.py .......                               [ 43%]
+tests/modules/story/test_engine.py ..                                    [ 44%]
+tests/modules/story/test_exceptions.py ......                            [ 47%]
+tests/modules/subtitles/test_formats.py ......                           [ 50%]
+tests/modules/subtitles/test_subtitle_agents.py ........                 [ 53%]
+tests/modules/subtitles/test_subtitle_engine.py ....                     [ 55%]
+tests/modules/test_production_agents.py .........                        [ 59%]
+tests/modules/test_qa.py ....                                            [ 60%]
+tests/modules/test_voice_agents.py ......                                [ 63%]
+tests/modules/test_voice_engine.py ..                                    [ 64%]
+tests/modules/thumbnails/test_thumb_agents.py ..                         [ 65%]
+tests/modules/timeline/test_db_perf.py ..                                [ 66%]
+tests/modules/timeline/test_service.py ...                               [ 67%]
+tests/modules/timeline/test_timeline_agents.py ........                  [ 70%]
+tests/modules/video/test_video_agents.py ........                        [ 74%]
+tests/modules/vision/test_preprocessing.py .                             [ 74%]
+tests/modules/vision/test_vision_agents.py ....                          [ 76%]
+tests/modules/vision/test_vision_pipeline.py .                           [ 76%]
+tests/modules/youtube/test_yt_agents.py .........                        [ 80%]
+tests/test_api.py ....                                                   [ 82%]
+tests/test_cache.py ....                                                 [ 84%]
+tests/test_config.py ....                                                [ 86%]
+tests/test_core_exceptions.py ..                                         [ 86%]
+tests/test_database.py ..                                                [ 87%]
+tests/test_jobs.py ...                                                   [ 89%]
+tests/test_logging.py ..                                                 [ 90%]
+tests/test_memory.py .......                                             [ 93%]
+tests/test_memory_api.py .........                                       [ 96%]
+tests/test_plugins.py .                                                  [ 97%]
+tests/test_session.py .                                                  [ 97%]
+tests/test_storage.py .....                                              [100%]
+
+=============================== warnings summary ===============================
+app/schemas/voice.py:34
+  /app/app/schemas/voice.py:34: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class VoiceProfileResponse(VoiceProfileBase):
+
+app/schemas/voice.py:55
+  /app/app/schemas/voice.py:55: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class PronunciationDictionaryResponse(PronunciationDictionaryBase):
+
+app/schemas/voice.py:82
+  /app/app/schemas/voice.py:82: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioSegmentResponse(AudioSegmentBase):
+
+app/schemas/voice.py:107
+  /app/app/schemas/voice.py:107: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class TimestampIndexResponse(TimestampIndexBase):
+
+app/schemas/voice.py:130
+  /app/app/schemas/voice.py:130: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioVersionResponse(AudioVersionBase):
+
+app/schemas/voice.py:153
+  /app/app/schemas/voice.py:153: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioQualityReportResponse(AudioQualityReportBase):
+
+app/schemas/voice.py:184
+  /app/app/schemas/voice.py:184: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.13/migration/
+    class AudioJobResponse(AudioJobBase):
+
+tests/modules/thumbnails/test_thumb_agents.py::test_thumbnail_planning_agent
+  /app/modules/thumbnails/planning_agent.py:57: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    db.add(thumb)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/modules/thumbnails/test_thumb_agents.py::test_thumbnail_composition_agent
+  /app/modules/thumbnails/composition_agent.py:45: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    db.add(variant)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/modules/timeline/test_service.py::TestTimelineService::test_generate_timeline_success
+tests/modules/timeline/test_service.py::TestTimelineService::test_generate_timeline_with_agent_mocking
+  /app/modules/timeline/service.py:52: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    self.db.add(timeline)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/modules/timeline/test_service.py::TestTimelineService::test_generate_timeline_success
+  /home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/_pytest/threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-16 (_connection_worker_thread)
+
+  Traceback (most recent call last):
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 66, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_result, future, result)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  During handling of the above exception, another exception occurred:
+
+  Traceback (most recent call last):
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 75, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_exception, future, e)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+tests/modules/timeline/test_service.py::TestTimelineService::test_generate_timeline_success
+  /home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/_pytest/threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-17 (_connection_worker_thread)
+
+  Traceback (most recent call last):
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 66, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_result, future, result)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  During handling of the above exception, another exception occurred:
+
+  Traceback (most recent call last):
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 75, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_exception, future, e)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+tests/modules/timeline/test_service.py::TestTimelineService::test_get_timeline
+  /home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/_pytest/threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-14 (_connection_worker_thread)
+
+  Traceback (most recent call last):
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 66, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_result, future, result)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  During handling of the above exception, another exception occurred:
+
+  Traceback (most recent call last):
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 75, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_exception, future, e)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+tests/modules/timeline/test_service.py::TestTimelineService::test_get_timeline
+  /home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/_pytest/threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-15 (_connection_worker_thread)
+
+  Traceback (most recent call last):
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 66, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_result, future, result)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  During handling of the above exception, another exception occurred:
+
+  Traceback (most recent call last):
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 75, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_exception, future, e)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+tests/modules/timeline/test_service.py::TestTimelineService::test_get_timeline
+  /home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/_pytest/threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-3 (_connection_worker_thread)
+
+  Traceback (most recent call last):
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 66, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_result, future, result)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  During handling of the above exception, another exception occurred:
+
+  Traceback (most recent call last):
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 75, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_exception, future, e)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+tests/modules/timeline/test_service.py::TestTimelineService::test_get_timeline
+  /home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/_pytest/threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-11 (_connection_worker_thread)
+
+  Traceback (most recent call last):
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 66, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_result, future, result)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  During handling of the above exception, another exception occurred:
+
+  Traceback (most recent call last):
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 75, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_exception, future, e)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+tests/modules/youtube/test_yt_agents.py::test_seo_agent_titles
+  /app/modules/youtube/seo_agent.py:44: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    db.add(title)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/modules/youtube/test_yt_agents.py::test_seo_agent_description
+  /app/modules/youtube/seo_agent.py:69: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    db.add(description)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/modules/youtube/test_yt_agents.py::test_publishing_agent
+  /app/modules/youtube/publishing_agent.py:102: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    db.add(published_record)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/modules/youtube/test_yt_agents.py::test_playlist_agent
+  /app/modules/youtube/playlist_agent.py:41: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    db.add(playlist)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/modules/youtube/test_yt_agents.py::test_playlist_agent
+  /home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/_pytest/threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-18 (_connection_worker_thread)
+
+  Traceback (most recent call last):
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 66, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_result, future, result)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  During handling of the above exception, another exception occurred:
+
+  Traceback (most recent call last):
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "/home/jules/.cache/pypoetry/virtualenvs/amras-9TtSrW0h-py3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 75, in _connection_worker_thread
+      future.get_loop().call_soon_threadsafe(set_exception, future, e)
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 844, in call_soon_threadsafe
+      self._check_closed()
+    File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/asyncio/base_events.py", line 545, in _check_closed
+      raise RuntimeError('Event loop is closed')
+  RuntimeError: Event loop is closed
+
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+tests/modules/youtube/test_yt_agents.py::test_analytics_agent
+  /app/modules/youtube/analytics_agent.py:50: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    db.add(profile)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+====================== 230 passed, 23 warnings in 51.46s =======================

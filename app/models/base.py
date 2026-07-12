@@ -5,7 +5,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.sql import func
 
 
-class Base(DeclarativeBase):  # type: ignore
+class Base(DeclarativeBase):
     pass
 
 

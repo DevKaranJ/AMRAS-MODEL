@@ -1,22 +1,22 @@
-import pytest
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+import pytest  # noqa: E402
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine  # noqa: E402
 
-from app.models.base import Base
-from app.models.core import Job
-from modules.production.agents.asset import AssetManagerAgent
-from modules.production.agents.model import AIModelManagerAgent
-from modules.production.agents.qa import QAAgent
-from modules.production.agents.queue import QueueItem, QueueManagerAgent
-from modules.production.agents.recovery import RecoveryAgent
-from modules.production.agents.settings import SettingsAgent
-from modules.production.agents.workflow import PipelineStageConfig, WorkflowManagerAgent
+from app.models.base import Base  # noqa: E402
+from app.models.core import Job  # noqa: E402
+from modules.production.agents.asset import AssetManagerAgent  # noqa: E402
+from modules.production.agents.model import AIModelManagerAgent  # noqa: E402
+from modules.production.agents.qa import QAAgent  # noqa: E402
+from modules.production.agents.queue import QueueItem, QueueManagerAgent  # noqa: E402
+from modules.production.agents.recovery import RecoveryAgent  # noqa: E402
+from modules.production.agents.settings import SettingsAgent  # noqa: E402
+from modules.production.agents.workflow import PipelineStageConfig, WorkflowManagerAgent  # noqa: E402
 
 pytestmark = pytest.mark.asyncio
 
 engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
 TestingSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
 
-from typing import AsyncGenerator
+from typing import AsyncGenerator  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
@@ -84,18 +84,21 @@ async def test_queue_manager_agent() -> None:
     assert q_status[0].priority == 10
 
 
-import tempfile
+import tempfile  # noqa: E402
 
 
-async def test_asset_manager_agent() -> None:
-    with tempfile.TemporaryDirectory() as tmpdir:
-        agent = AssetManagerAgent(base_storage_path=tmpdir)
-        res = await agent.register_asset(1, "image", "test_file.png")
-        assert res["status"] == "registered"
+async def test_asset_manager_agent(tmp_path: pytest.TempPath) -> None:  # type: ignore[name-defined]
+    # Create test file in temporary directory
+    test_file_path = tmp_path / "test_file.png"
+    test_file_path.write_text("dummy")
 
-        assets = await agent.get_project_assets(1)
-        assert len(assets) == 1
-        assert assets[0]["filename"] == "test_file.png"
+    agent = AssetManagerAgent(base_storage_path=str(tmp_path))
+    res = await agent.register_asset(1, "image", str(test_file_path))
+    assert res["status"] == "registered"
+
+    assets = await agent.get_project_assets(1)
+    assert len(assets) == 1
+    assert assets[0]["filename"] == "test_file.png"
 
 
 async def test_model_manager_agent(db_session: AsyncSession) -> None:

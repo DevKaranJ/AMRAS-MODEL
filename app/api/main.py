@@ -3,11 +3,9 @@ from typing import Any
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
-from app.api.endpoints.deployment import router as deployment_router
 from app.api.endpoints.ingestion import router as ingestion_router
 from app.api.endpoints.memory import router as memory_router
 from app.api.endpoints.ocr import router as ocr_router
-from app.api.endpoints.optimization import router as optimization_router
 from app.api.endpoints.production import router as production_router
 from app.api.endpoints.qa import router as qa_router
 from app.api.endpoints.story import router as story_router
@@ -45,10 +43,6 @@ app.include_router(youtube_router, tags=["youtube", "publishing"])
 app.include_router(thumbnails_router, prefix="/thumbnail", tags=["thumbnails"])
 app.include_router(qa_router, prefix="/qa", tags=["qa"])
 app.include_router(production_router, prefix="/production", tags=["production"])
-
-
-app.include_router(optimization_router, prefix="/optimization", tags=["optimization"])
-app.include_router(deployment_router, prefix="/deployment", tags=["deployment"])
 
 
 @app.exception_handler(AmrasException)

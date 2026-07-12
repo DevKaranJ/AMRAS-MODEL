@@ -1,18 +1,19 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, Mock  # noqa: E402
 
-import pytest
+import pytest  # noqa: E402
 
 
 @pytest.fixture
 def mock_db_session() -> AsyncMock:
     session = AsyncMock()
+    session.add = Mock()  # Make add() synchronous
     return session
 
 
-from app.models.timeline import TimelineScene
-from app.models.youtube import Thumbnail
-from modules.thumbnails.composition_agent import ThumbnailCompositionAgent
-from modules.thumbnails.planning_agent import ThumbnailPlanningAgent
+from app.models.timeline import TimelineScene  # noqa: E402
+from app.models.youtube import Thumbnail  # noqa: E402
+from modules.thumbnails.composition_agent import ThumbnailCompositionAgent  # noqa: E402
+from modules.thumbnails.planning_agent import ThumbnailPlanningAgent  # noqa: E402
 
 
 @pytest.mark.asyncio
@@ -43,7 +44,7 @@ async def test_thumbnail_planning_agent(mock_db_session: AsyncMock) -> None:
 
     # Skip actual creation
     for i in range(10):
-        scene = TimelineScene(
+        TimelineScene(
             timeline_id=timeline_id,
             sequence_number=i,
             start_time_ms=i * 1000,
