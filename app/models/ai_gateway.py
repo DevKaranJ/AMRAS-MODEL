@@ -160,6 +160,6 @@ class FailureHistory(Base, TimestampMixin):
     request_id: Mapped[Optional[int]] = mapped_column(ForeignKey("ai_requests.id"), index=True)
     model_id: Mapped[Optional[int]] = mapped_column(ForeignKey("ai_models.id"), index=True)
     error_type: Mapped[str] = mapped_column(String(100))
-    error_message: Mapped[Text] = mapped_column(Text)
-    stack_trace: Mapped[Optional[Text]] = mapped_column(Text)
+    error_message: Mapped[str] = mapped_column(Text)
+    stack_trace: Mapped[Optional[str]] = mapped_column(Text)
     context: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON)

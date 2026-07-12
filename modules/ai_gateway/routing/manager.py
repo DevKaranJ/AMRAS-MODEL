@@ -41,6 +41,6 @@ class RoutingManager:
                     if model.name == preferred:
                         return model
 
-        available_models.sort(key=lambda x: (x.priority, -(x.average_latency or float("inf"))), reverse=True)
+        available_models.sort(key=lambda x: (x.priority, -(x.average_latency if x.average_latency is not None else float("inf"))), reverse=True)
 
         return available_models[0]

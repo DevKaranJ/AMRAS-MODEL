@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.ai_gateway import AIGatewayProvider, AIModel
@@ -24,9 +25,16 @@ class ModelRegistryService:
 
         provider = AIGatewayProvider(**provider_in.model_dump())
         self.db.add(provider)
-        await self.db.commit()
-        await self.db.refresh(provider)
-        return provider
+        try:
+            await self.db.commit()
+            await self.db.refresh(provider)
+            return provider
+        except IntegrityError:
+            await self.db.rollback()
+            existing = await self.get_provider_by_name(provider_in.name)
+            if existing:
+                return existing
+            raise
 
     async def get_model_by_name(self, name: str) -> Optional[AIModel]:
         result = await self.db.execute(select(AIModel).where(AIModel.name == name))
@@ -45,9 +53,16 @@ class ModelRegistryService:
 
         model = AIModel(**model_in.model_dump())
         self.db.add(model)
-        await self.db.commit()
-        await self.db.refresh(model)
-        return model
+        try:
+            await self.db.commit()
+            await self.db.refresh(model)
+            return model
+        except IntegrityError:
+            await self.db.rollback()
+            existing = await self.get_model_by_name(model_in.name)
+            if existing:
+                return existing
+            raise
 
     async def get_models_by_capability(self, capability: str) -> List[AIModel]:
         result = await self.db.execute(select(AIModel).where(AIModel.is_active))
