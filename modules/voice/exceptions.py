@@ -1,8 +1,10 @@
+from typing import Any
+
 from app.core.exceptions import AmrasException
 
 
 class VoiceGenerationError(AmrasException):
-    def __init__(self, message: str, details: dict = None):
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(
             error_code="VOICE_GENERATION_FAILED",
             message=message,
@@ -13,7 +15,7 @@ class VoiceGenerationError(AmrasException):
 
 
 class AudioStitchingError(AmrasException):
-    def __init__(self, message: str, details: dict = None):
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(
             error_code="AUDIO_STITCHING_FAILED",
             message=message,
@@ -24,7 +26,7 @@ class AudioStitchingError(AmrasException):
 
 
 class NormalizationError(AmrasException):
-    def __init__(self, message: str, details: dict = None):
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(
             error_code="AUDIO_NORMALIZATION_FAILED",
             message=message,

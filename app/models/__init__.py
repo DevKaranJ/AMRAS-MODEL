@@ -1,3 +1,17 @@
+from app.models.ai_gateway import (
+    AIGatewayProvider,
+    AIModel,
+    AIRequest,
+    AIResponse,
+    CacheEntry,
+    FailureHistory,
+    HealthReport,
+    ModelBenchmark,
+    PromptTemplate,
+    PromptVersion,
+    RoutingPolicy,
+    UsageStatistic,
+)
 from app.models.base import Base
 from app.models.core import AIProvider, Job, JobLog, Project, Setting, SystemState
 from app.models.manga import Chapter, DownloadJob, ImportJob, Manga, Page
@@ -102,6 +116,18 @@ from app.models.youtube import (
 )
 
 __all__ = [
+    "AIGatewayProvider",
+    "AIModel",
+    "AIRequest",
+    "AIResponse",
+    "CacheEntry",
+    "FailureHistory",
+    "HealthReport",
+    "ModelBenchmark",
+    "PromptTemplate",
+    "PromptVersion",
+    "RoutingPolicy",
+    "UsageStatistic",
     "ActionDetected",
     "CharacterDetected",
     "ConfidenceScore",

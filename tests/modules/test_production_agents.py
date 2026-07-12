@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest  # noqa: E402
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine  # noqa: E402
 
@@ -84,10 +86,7 @@ async def test_queue_manager_agent() -> None:
     assert q_status[0].priority == 10
 
 
-import tempfile  # noqa: E402
-
-
-async def test_asset_manager_agent(tmp_path: pytest.TempPath) -> None:  # type: ignore[name-defined]
+async def test_asset_manager_agent(tmp_path: Any) -> None:  # type: ignore[name-defined]
     # Create test file in temporary directory
     test_file_path = tmp_path / "test_file.png"
     test_file_path.write_text("dummy")

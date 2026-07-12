@@ -1,3 +1,17 @@
+from app.schemas.ai_gateway import (
+    AIGatewayProviderCreate,
+    AIGatewayProviderRead,
+    AIModelCreate,
+    AIModelRead,
+    AIRequestCreate,
+    AIRequestRead,
+    AIResponseCreate,
+    AIResponseRead,
+    PromptTemplateCreate,
+    PromptTemplateRead,
+    RoutingPolicyCreate,
+    RoutingPolicyRead,
+)
 from app.schemas.job import DownloadJobCreate, DownloadJobRead, ImportJobCreate, ImportJobRead
 from app.schemas.manga import ChapterCreate, ChapterRead, MangaCreate, MangaMetadata, MangaRead, PageCreate, PageRead
 from app.schemas.video import (
@@ -29,6 +43,18 @@ from app.schemas.video import (
 )
 
 __all__ = [
+    "AIGatewayProviderCreate",
+    "AIGatewayProviderRead",
+    "AIModelCreate",
+    "AIModelRead",
+    "RoutingPolicyCreate",
+    "RoutingPolicyRead",
+    "PromptTemplateCreate",
+    "PromptTemplateRead",
+    "AIRequestCreate",
+    "AIRequestRead",
+    "AIResponseCreate",
+    "AIResponseRead",
     "CharacterDetectedSchema",
     "OCRExtractionResult",
     "PageVisionResult",
