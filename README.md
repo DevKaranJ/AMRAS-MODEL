@@ -6,7 +6,7 @@
 
 **Convert complete manga series into high-quality, human-like YouTube recap videos with minimal manual intervention.**
 
-[![CI](https://github.com/your-org/amras/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/amras/actions/workflows/ci.yml)
+[![CI](https://github.com/DevKaranJ/AMRAS-MODEL/actions/workflows/ci.yml/badge.svg)](https://github.com/DevKaranJ/AMRAS-MODEL/actions/workflows/ci.yml)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-black.svg)](https://github.com/astral-sh/ruff)
@@ -24,6 +24,7 @@
 - [Features](#features)
 - [Architecture Overview](#architecture-overview)
 - [Technology Stack](#technology-stack)
+- [Quick Start (Automated)](#quick-start-automated)
 - [Installation Guide](#installation-guide)
 - [Configuration](#configuration)
 - [API Reference](#api-reference)
@@ -448,6 +449,31 @@ graph LR
 
 ---
 
+## Quick Start (Automated)
+
+The fastest way to get AMRAS running is the interactive setup script, which
+checks prerequisites, installs dependencies, configures your `.env`, runs
+migrations, and launches the server — all in one go.
+
+```bash
+git clone https://github.com/DevKaranJ/AMRAS-MODEL.git
+cd AMRAS-MODEL
+python setup.py
+```
+
+The script will guide you through:
+- Verifying Python 3.12+, Poetry, FFmpeg, and Tesseract are installed
+- Generating a secure API key or using your own
+- Choosing SQLite (development) or PostgreSQL (production)
+- Configuring the AI provider (local mock, OpenAI, Anthropic, etc.)
+- Running database migrations
+- Optionally running the test suite
+- Starting the server at `http://localhost:8000`
+
+> **Manual setup?** Continue to the [Installation Guide](#installation-guide) below.
+
+---
+
 ## Installation Guide
 
 ### Prerequisites
@@ -462,8 +488,8 @@ graph LR
 ### Clone
 
 ```bash
-git clone https://github.com/your-org/amras.git
-cd amras
+git clone https://github.com/DevKaranJ/AMRAS-MODEL.git
+cd AMRAS-MODEL
 ```
 
 ### Install Dependencies
@@ -1010,8 +1036,8 @@ tests/
 
 ```bash
 # 1. Clone and install
-git clone https://github.com/your-org/amras.git
-cd amras
+git clone https://github.com/DevKaranJ/AMRAS-MODEL.git
+cd AMRAS-MODEL
 poetry install
 
 # 2. Setup pre-commit hooks

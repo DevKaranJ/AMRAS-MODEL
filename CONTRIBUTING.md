@@ -17,7 +17,7 @@ Thank you for your interest in contributing to AMRAS! This guide will help you g
 # Fork the repository on GitHub
 
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/amras.git
+git clone https://github.com/DevKaranJ/AMRAS-MODEL.git
 cd amras
 
 # Install dependencies

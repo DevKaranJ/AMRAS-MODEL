@@ -13,7 +13,7 @@ If you discover a security vulnerability in AMRAS, please report it responsibly.
 ### How to Report
 
 1. **Do NOT** open a public GitHub issue for security vulnerabilities
-2. Email security concerns to: security@example.com
+2. Submit a private security advisory at: https://github.com/DevKaranJ/AMRAS-MODEL/security/advisories/new
 3. Include:
    - Description of the vulnerability
    - Steps to reproduce
