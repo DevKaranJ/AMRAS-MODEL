@@ -1,7 +1,7 @@
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Base paths
@@ -12,15 +12,34 @@ DEFAULT_STORAGE_DIR = BASE_DIR / "storage"
 class DatabaseSettings(BaseModel):
     url: str = Field(default=f"sqlite+aiosqlite:///{BASE_DIR}/dev.db")
     echo: bool = Field(default=False)
+    # pool_size / max_overflow are ignored by SQLite's StaticPool; they apply
+    # only when DATABASE__URL points to PostgreSQL / MySQL.
     pool_size: int = Field(default=5)
     max_overflow: int = Field(default=10)
+
+    @property
+    def is_sqlite(self) -> bool:
+        return self.url.startswith("sqlite")
 
 
 class LoggingSettings(BaseModel):
     level: str = Field(default="INFO")
     format: str = Field(default="json")
     file: Optional[str] = Field(default=None)
+    # Accepts "10 MB", "10MB", "100 MB" etc.
     rotation: str = Field(default="10 MB")
+
+    @property
+    def rotation_bytes(self) -> int:
+        """Return rotation threshold as bytes (parses '<N> MB' or '<N>MB')."""
+        raw = self.rotation.replace(" ", "").upper()
+        if raw.endswith("MB"):
+            return int(raw[:-2]) * 1024 * 1024
+        if raw.endswith("GB"):
+            return int(raw[:-2]) * 1024 * 1024 * 1024
+        if raw.endswith("KB"):
+            return int(raw[:-2]) * 1024
+        return 10 * 1024 * 1024  # fallback 10 MB
 
 
 class AIProviderSettings(BaseModel):
@@ -67,6 +86,20 @@ class AppSettings(BaseSettings):
     version: str = "0.1.0"
     debug: bool = False
 
+    # ------------------------------------------------------------------ #
+    # Security                                                             #
+    # ------------------------------------------------------------------ #
+    # Set AMRAS_API_KEY in your environment / .env file.
+    # If unset, all API requests will be rejected with HTTP 503.
+    api_key: Optional[str] = Field(default=None, alias="AMRAS_API_KEY")
+
+    # CORS — comma-separated list of allowed origins, e.g.
+    # AMRAS_ALLOWED_ORIGINS="http://localhost:3000,https://myapp.example.com"
+    allowed_origins: List[str] = Field(default=["*"])
+
+    # ------------------------------------------------------------------ #
+    # Sub-settings                                                         #
+    # ------------------------------------------------------------------ #
     db: DatabaseSettings = Field(default_factory=DatabaseSettings)
     log: LoggingSettings = Field(default_factory=LoggingSettings)
     ai: AIProviderSettings = Field(default_factory=AIProviderSettings)
@@ -80,7 +113,15 @@ class AppSettings(BaseSettings):
         env_file_encoding="utf-8",
         env_nested_delimiter="__",
         case_sensitive=False,
+        populate_by_name=True,
     )
+
+    @field_validator("allowed_origins", mode="before")
+    @classmethod
+    def parse_origins(cls, v: object) -> List[str]:
+        if isinstance(v, str):
+            return [o.strip() for o in v.split(",") if o.strip()]
+        return list(v)  # type: ignore[arg-type]
 
 
 def get_settings() -> AppSettings:
