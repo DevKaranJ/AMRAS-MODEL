@@ -41,11 +41,11 @@ async def update_memory(
     return memory
 
 
-@router.post("/rebuild", status_code=status.HTTP_202_ACCEPTED)
+@router.post("/rebuild", status_code=status.HTTP_501_NOT_IMPLEMENTED)
 async def rebuild_memory() -> Any:
     """Trigger a background job to rebuild the memory index and knowledge graph."""
     logger.info("memory_rebuild_requested")
-    return {"status": "rebuild_job_queued"}
+    return {"status": "unsupported", "message": "Memory rebuild is not yet implemented"}
 
 
 @router.get("", response_model=List[MemoryStoreRead])
@@ -59,7 +59,7 @@ async def get_memories(
     stmt = select(MemoryStore)
     if entity_type:
         stmt = stmt.where(MemoryStore.entity_type == entity_type)
-    stmt = stmt.offset(offset).limit(limit)
+    stmt = stmt.order_by(MemoryStore.id).offset(offset).limit(limit)
     result = await db.execute(stmt)
     return result.scalars().all()
 
@@ -140,11 +140,14 @@ async def get_memory_history(entity_id: str, db: AsyncSession = Depends(get_db_s
 @router.get("/conflicts", response_model=List[ConflictReportRead])
 async def get_memory_conflicts(
     resolved: Optional[bool] = Query(None, description="Filter by resolution status"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=1000),
     db: AsyncSession = Depends(get_db_session),
 ) -> Any:
     """Retrieve detected memory conflicts."""
     stmt = select(ConflictReport)
     if resolved is not None:
         stmt = stmt.where(ConflictReport.resolved.is_(resolved))
+    stmt = stmt.order_by(ConflictReport.id).offset(skip).limit(limit)
     result = await db.execute(stmt)
     return result.scalars().all()

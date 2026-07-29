@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.logger import get_logger
 from app.database.session import get_db_session
@@ -57,6 +58,16 @@ async def regenerate_audio(
     if not segments:
         raise HTTPException(status_code=404, detail="No segments found with provided IDs")
 
+    # Validate all requested IDs exist
+    found_ids = {seg.id for seg in segments}
+    requested_ids = set(request.segment_ids)
+    missing_ids = requested_ids - found_ids
+    if missing_ids:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Segment IDs not found: {sorted(missing_ids)}"
+        )
+
     for seg in segments:
         seg.status = "pending"
         if request.voice_profile_id:
@@ -65,7 +76,7 @@ async def regenerate_audio(
             seg.emotion = request.emotion
 
     await db.commit()
-    return {"status": "success", "message": "Segments queued for regeneration", "segments": request.segment_ids}
+    return {"status": "success", "message": "Segments queued for regeneration", "segments": list(found_ids)}
 
 
 @router.post("/normalize", response_model=Dict[str, Any])
@@ -85,6 +96,7 @@ async def normalize_audio(
         select(AudioVersion)
         .where(AudioVersion.job_id == request.job_id, AudioVersion.type == "master")
         .order_by(AudioVersion.version_number.desc())
+        .limit(1)
     )
     version_result = await db.execute(version_stmt)
     master_version = version_result.scalar_one_or_none()
@@ -125,7 +137,7 @@ async def normalize_audio(
 
 @router.get("", response_model=List[AudioJobResponse])
 async def get_audio_jobs(db: AsyncSession = Depends(get_db_session)) -> Any:
-    stmt = select(AudioJob).order_by(AudioJob.created_at.desc())
+    stmt = select(AudioJob).options(selectinload(AudioJob.segments)).order_by(AudioJob.created_at.desc())
     result = await db.execute(stmt)
     return result.scalars().all()
 

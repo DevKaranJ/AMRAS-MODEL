@@ -33,12 +33,15 @@ class LoggingSettings(BaseModel):
     def rotation_bytes(self) -> int:
         """Return rotation threshold as bytes (parses '<N> MB' or '<N>MB')."""
         raw = self.rotation.replace(" ", "").upper()
-        if raw.endswith("MB"):
-            return int(raw[:-2]) * 1024 * 1024
-        if raw.endswith("GB"):
-            return int(raw[:-2]) * 1024 * 1024 * 1024
-        if raw.endswith("KB"):
-            return int(raw[:-2]) * 1024
+        try:
+            if raw.endswith("MB"):
+                return int(raw[:-2]) * 1024 * 1024
+            if raw.endswith("GB"):
+                return int(raw[:-2]) * 1024 * 1024 * 1024
+            if raw.endswith("KB"):
+                return int(raw[:-2]) * 1024
+        except (ValueError, IndexError):
+            pass
         return 10 * 1024 * 1024  # fallback 10 MB
 
 
@@ -95,7 +98,7 @@ class AppSettings(BaseSettings):
 
     # CORS — comma-separated list of allowed origins, e.g.
     # AMRAS_ALLOWED_ORIGINS="http://localhost:3000,https://myapp.example.com"
-    allowed_origins: List[str] = Field(default=["*"])
+    allowed_origins: List[str] = Field(default=["*"], alias="AMRAS_ALLOWED_ORIGINS")
 
     # ------------------------------------------------------------------ #
     # Sub-settings                                                         #

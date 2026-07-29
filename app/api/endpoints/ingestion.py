@@ -33,7 +33,7 @@ class ImportRequest(BaseModel):
         """Reject paths that escape the designated manga storage directory."""
         resolved = Path(v).resolve()
         manga_dir = settings.storage.manga_dir.resolve()
-        if not str(resolved).startswith(str(manga_dir)):
+        if resolved != manga_dir and manga_dir not in resolved.parents:
             raise ValueError(
                 f"source_path must be within the manga storage directory ({manga_dir}). "
                 "Absolute paths outside that directory are not permitted."
@@ -52,7 +52,7 @@ class DownloadRequest(BaseModel):
         """Reject destination directories that escape the storage root."""
         resolved = Path(v).resolve()
         storage_root = settings.storage.base_dir.resolve()
-        if not str(resolved).startswith(str(storage_root)):
+        if resolved != storage_root and storage_root not in resolved.parents:
             raise ValueError(
                 f"dest_dir must be within the storage root ({storage_root}). "
                 "Paths outside that directory are not permitted."
@@ -183,6 +183,10 @@ async def list_manga(
     session: AsyncSession = Depends(get_db_session),
 ) -> List[Dict[str, Any]]:
     """List imported manga with pagination."""
+    if skip < 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="skip cannot be negative")
+    if limit < 0:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="limit cannot be negative")
     if limit > 200:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="limit cannot exceed 200")
     stmt = select(Manga).offset(skip).limit(limit)
