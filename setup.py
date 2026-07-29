@@ -29,6 +29,7 @@ import sys
 import textwrap
 from pathlib import Path
 from typing import Optional
+from urllib.parse import quote_plus
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Colours (disabled automatically on Windows when ANSI is unavailable)
@@ -276,14 +277,14 @@ def configure_env() -> None:
     print(bold("  API Security"))
     current_key = existing.get("AMRAS_API_KEY", "")
     if current_key and current_key != "change-me-to-a-strong-random-secret":
-        _ok(f"AMRAS_API_KEY is already set (****{current_key[-4:]})")
+        _ok("AMRAS_API_KEY is already set")
     else:
         suggested = _gen_api_key()
         print(f"  {yellow('!')} A strong API key is required. We can generate one for you.")
         use_generated = _confirm("  Generate a random API key automatically?", default=True)
         if use_generated:
             new_env["AMRAS_API_KEY"] = suggested
-            _ok(f"Generated API key: {suggested[:8]}…{suggested[-4:]} (saved to .env)")
+            _ok("Generated new API key (saved to .env)")
         else:
             while True:
                 key = _ask("Enter your API key (min 16 characters)", secret=True)
@@ -317,7 +318,7 @@ def configure_env() -> None:
         user = _ask("  PostgreSQL user", default="amras")
         password = _ask("  PostgreSQL password", secret=True)
         dbname = _ask("  PostgreSQL database name", default="amras")
-        new_env["DB__URL"] = f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{dbname}"
+        new_env["DB__URL"] = f"postgresql+asyncpg://{quote_plus(user)}:{quote_plus(password)}@{host}:{port}/{dbname}"
     else:
         default_sqlite = existing.get("DB__URL", "sqlite+aiosqlite:///./dev.db")
         db_url = _ask("SQLite database path (URL)", default=default_sqlite)

@@ -16,7 +16,7 @@ services:
       - DB__URL=sqlite+aiosqlite:////app/dev.db
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "-H", "X-API-Key: ${AMRAS_API_KEY}", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "-H", "X-API-Key: ${AMRAS_API_KEY:?AMRAS_API_KEY must be set}", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
