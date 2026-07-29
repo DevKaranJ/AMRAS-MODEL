@@ -19,9 +19,8 @@ def setup_logging() -> None:
     if settings.log.file:
         file_handler = RotatingFileHandler(
             filename=settings.log.file,
-            maxBytes=int(settings.log.rotation.replace(" MB", "")) * 1024 * 1024
-            if "MB" in settings.log.rotation
-            else 10485760,  # simple parsing
+            # Use the robust rotation_bytes property instead of manual string parsing
+            maxBytes=settings.log.rotation_bytes,
             backupCount=5,
         )
         handlers.append(file_handler)
