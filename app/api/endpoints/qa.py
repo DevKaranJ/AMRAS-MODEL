@@ -26,7 +26,6 @@ async def run_qa(request: QARunRequest, db: AsyncSession = Depends(get_db_sessio
     engine = QAEngine(db)
     report = await engine.run_pipeline(request.project_id, request.modules)
 
-    # Reload report with relationships to satisfy Pydantic
     stmt = (
         select(QAReport)
         .where(QAReport.id == report.id)
@@ -40,8 +39,7 @@ async def run_qa(request: QARunRequest, db: AsyncSession = Depends(get_db_sessio
 async def repair_issues(request: QARepairRequest, db: AsyncSession = Depends(get_db_session)) -> Any:
     """Automatically fix identified safe issues."""
     engine = QAEngine(db)
-    results = await engine.run_autofix(request.project_id, request.issue_ids)
-    return results
+    return await engine.run_autofix(request.project_id, request.issue_ids)
 
 
 @router.post("/revalidate", response_model=QAReportResponse)
@@ -80,7 +78,10 @@ async def get_report(project_id: int, db: AsyncSession = Depends(get_db_session)
 async def get_issues(project_id: int, db: AsyncSession = Depends(get_db_session)) -> Any:
     """Get all outstanding issues for a project."""
     stmt = (
-        select(IssueReport).join(QAReport).where(QAReport.project_id == project_id).where(IssueReport.is_fixed == False)  # noqa
+        select(IssueReport)
+        .join(QAReport)
+        .where(QAReport.project_id == project_id)
+        .where(IssueReport.is_fixed.is_(False))  # use is_(False) not == False
     )
     result = await db.execute(stmt)
     return list(result.scalars().all())

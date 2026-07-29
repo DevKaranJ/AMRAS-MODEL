@@ -1,9 +1,10 @@
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.logger import get_logger
 from app.database.session import get_db_session
 from app.models.story import (
     KnowledgeBaseEntry,
@@ -23,6 +24,7 @@ from app.schemas.story import (
 from modules.story.engine import StoryEngine
 from modules.story.exceptions import StoryEngineError
 
+logger = get_logger("amras.api.story")
 router = APIRouter()
 engine = StoryEngine()
 
@@ -36,62 +38,83 @@ async def process_story(
     Process OCR and Vision JSON to build the story understanding.
     """
     try:
-        # Process the chapter inline (in production, dispatch to background task)
         result = await engine.process_chapter(chapter_id, vision_data)
         return {"status": "completed", "data": result}
-    except StoryEngineError as e:
-        # StoryEngineError wraps all exceptions including internal failures
-        raise HTTPException(status_code=500, detail=str(e)) from e
+    except StoryEngineError as exc:
+        logger.exception("story_processing_failed", chapter_id=chapter_id, error=str(exc))
+        raise HTTPException(status_code=500, detail="Story processing failed. Please retry.") from exc
 
 
 @router.get("/", response_model=Dict[str, Any])
 async def get_story_overview() -> Dict[str, Any]:
-    """
-    Returns an overview of the story knowledge base (stub).
-    """
-    # A full implementation would query multiple tables to construct the story graph
+    """Returns an overview of the story knowledge base (stub)."""
     return {"status": "active", "message": "Story Engine running"}
 
 
 @router.get("/characters", response_model=List[StoryCharacterRead])
-async def get_characters(db: AsyncSession = Depends(get_db_session)) -> Any:
-    """List all extracted characters."""
-    result = await db.execute(select(StoryCharacter).order_by(StoryCharacter.id).limit(100))
+async def get_characters(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
+    """List all extracted characters with pagination."""
+    result = await db.execute(select(StoryCharacter).order_by(StoryCharacter.id).offset(skip).limit(limit))
     return result.scalars().all()
 
 
 @router.get("/events", response_model=List[StoryEventRead])
-async def get_events(db: AsyncSession = Depends(get_db_session)) -> Any:
-    """List all extracted story events."""
-    result = await db.execute(select(StoryEvent).order_by(StoryEvent.id).limit(100))
+async def get_events(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
+    """List all extracted story events with pagination."""
+    result = await db.execute(select(StoryEvent).order_by(StoryEvent.id).offset(skip).limit(limit))
     return result.scalars().all()
 
 
 @router.get("/relationships", response_model=List[StoryRelationshipRead])
-async def get_relationships(db: AsyncSession = Depends(get_db_session)) -> Any:
-    """List all extracted relationships."""
-    result = await db.execute(select(StoryRelationship).order_by(StoryRelationship.id).limit(100))
+async def get_relationships(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
+    """List all extracted relationships with pagination."""
+    result = await db.execute(select(StoryRelationship).order_by(StoryRelationship.id).offset(skip).limit(limit))
     return result.scalars().all()
 
 
 @router.get("/locations", response_model=List[StoryLocationRead])
-async def get_locations(db: AsyncSession = Depends(get_db_session)) -> Any:
-    """List all tracked locations."""
-    result = await db.execute(select(StoryLocation).order_by(StoryLocation.id).limit(100))
+async def get_locations(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
+    """List all tracked locations with pagination."""
+    result = await db.execute(select(StoryLocation).order_by(StoryLocation.id).offset(skip).limit(limit))
     return result.scalars().all()
 
 
 @router.get("/world", response_model=List[Dict[str, Any]])
-async def get_world_knowledge(db: AsyncSession = Depends(get_db_session)) -> Any:
-    """List world knowledge base entries."""
-    result = await db.execute(select(KnowledgeBaseEntry).order_by(KnowledgeBaseEntry.id).limit(100))
+async def get_world_knowledge(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
+    """List world knowledge base entries with pagination."""
+    result = await db.execute(
+        select(KnowledgeBaseEntry).order_by(KnowledgeBaseEntry.id).offset(skip).limit(limit)
+    )
     entries = result.scalars().all()
-    # Serialize since KnowledgeBaseEntryRead wasn't explicitly modeled for full dict output here easily
     return [{"id": e.id, "category": e.category, "key": e.key, "value": e.value} for e in entries]
 
 
 @router.get("/timeline", response_model=List[StoryTimelineRead])
-async def get_timeline(db: AsyncSession = Depends(get_db_session)) -> Any:
-    """List timeline entries."""
-    result = await db.execute(select(StoryTimeline).order_by(StoryTimeline.id).limit(100))
+async def get_timeline(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
+    db: AsyncSession = Depends(get_db_session),
+) -> Any:
+    """List timeline entries with pagination."""
+    result = await db.execute(select(StoryTimeline).order_by(StoryTimeline.id).offset(skip).limit(limit))
     return result.scalars().all()
