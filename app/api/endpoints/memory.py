@@ -1,6 +1,7 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import get_logger
@@ -26,9 +27,7 @@ async def update_memory(
     memory_in: MemoryStoreCreate,
     db: AsyncSession = Depends(get_db_session),
 ) -> Any:
-    """
-    Store or update a memory in the system.
-    """
+    """Store or update a memory in the system."""
     logger.info("memory_update_requested", entity_id=memory_in.entity_id)
     manager = MemoryManagerAgent(db)
     memory = await manager.store_memory(
@@ -44,44 +43,30 @@ async def update_memory(
 
 @router.post("/rebuild", status_code=status.HTTP_202_ACCEPTED)
 async def rebuild_memory() -> Any:
-    """
-    Trigger a background job to rebuild the memory index and knowledge graph.
-    """
+    """Trigger a background job to rebuild the memory index and knowledge graph."""
     logger.info("memory_rebuild_requested")
     return {"status": "rebuild_job_queued"}
 
 
 @router.get("", response_model=List[MemoryStoreRead])
 async def get_memories(
-    entity_type: str | None = Query(None, description="Filter by entity type"),
+    entity_type: Optional[str] = Query(None, description="Filter by entity type"),
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db_session),
 ) -> Any:
-    """
-    Retrieve a list of memories.
-    """
-    from sqlalchemy.future import select
-
+    """Retrieve a paginated list of memories."""
     stmt = select(MemoryStore)
     if entity_type:
         stmt = stmt.where(MemoryStore.entity_type == entity_type)
-    stmt = stmt.limit(limit).offset(offset)
+    stmt = stmt.offset(offset).limit(limit)
     result = await db.execute(stmt)
-    memories = result.scalars().all()
-    return memories
+    return result.scalars().all()
 
 
 @router.get("/character/{name}", response_model=CharacterMemoryRead)
-async def get_character_memory(
-    name: str,
-    db: AsyncSession = Depends(get_db_session),
-) -> Any:
-    """
-    Retrieve character memory by name.
-    """
-    from sqlalchemy.future import select
-
+async def get_character_memory(name: str, db: AsyncSession = Depends(get_db_session)) -> Any:
+    """Retrieve character memory by name."""
     stmt = select(CharacterMemory).where(CharacterMemory.name == name)
     result = await db.execute(stmt)
     character = result.scalar_one_or_none()
@@ -91,15 +76,8 @@ async def get_character_memory(
 
 
 @router.get("/event/{name}", response_model=EventMemoryRead)
-async def get_event_memory(
-    name: str,
-    db: AsyncSession = Depends(get_db_session),
-) -> Any:
-    """
-    Retrieve event memory by name.
-    """
-    from sqlalchemy.future import select
-
+async def get_event_memory(name: str, db: AsyncSession = Depends(get_db_session)) -> Any:
+    """Retrieve event memory by name."""
     stmt = select(EventMemory).where(EventMemory.name == name)
     result = await db.execute(stmt)
     event = result.scalar_one_or_none()
@@ -109,15 +87,8 @@ async def get_event_memory(
 
 
 @router.get("/location/{name}", response_model=WorldMemoryRead)
-async def get_location_memory(
-    name: str,
-    db: AsyncSession = Depends(get_db_session),
-) -> Any:
-    """
-    Retrieve world/location memory by name.
-    """
-    from sqlalchemy.future import select
-
+async def get_location_memory(name: str, db: AsyncSession = Depends(get_db_session)) -> Any:
+    """Retrieve world/location memory by name."""
     stmt = select(WorldMemory).where(WorldMemory.name == name)
     result = await db.execute(stmt)
     location = result.scalar_one_or_none()
@@ -132,31 +103,27 @@ async def search_memory(
     db: AsyncSession = Depends(get_db_session),
 ) -> Any:
     """
-    Search memory via keyword or semantic search.
-    """
-    from sqlalchemy.future import select
+    Search memory by entity/memory type and optional keyword.
 
+    The ``query`` field performs a case-insensitive substring match against the
+    ``entity_id`` column.  Full-text / vector search can be wired in here once a
+    search index is available.
+    """
     stmt = select(MemoryStore)
     if search_request.entity_type:
         stmt = stmt.where(MemoryStore.entity_type == search_request.entity_type)
     if search_request.memory_type:
         stmt = stmt.where(MemoryStore.memory_type == search_request.memory_type)
-    # Basic keyword search in JSON data (implementation depends on DB)
-    # For now, we'll just filter by type and return limited results
+    if search_request.query:
+        stmt = stmt.where(MemoryStore.entity_id.ilike(f"%{search_request.query}%"))
     stmt = stmt.limit(search_request.limit)
     result = await db.execute(stmt)
-    memories = result.scalars().all()
-    return memories
+    return result.scalars().all()
 
 
 @router.get("/history/{entity_id}", response_model=List[Dict[str, Any]])
-async def get_memory_history(
-    entity_id: str,
-    db: AsyncSession = Depends(get_db_session),
-) -> Any:
-    """
-    Retrieve the version history of a specific memory.
-    """
+async def get_memory_history(entity_id: str, db: AsyncSession = Depends(get_db_session)) -> Any:
+    """Retrieve the version history of a specific memory."""
     manager = MemoryManagerAgent(db)
     versions = await manager.get_memory_history(entity_id)
     return [
@@ -172,17 +139,12 @@ async def get_memory_history(
 
 @router.get("/conflicts", response_model=List[ConflictReportRead])
 async def get_memory_conflicts(
-    resolved: bool | None = Query(None, description="Filter by resolution status"),
+    resolved: Optional[bool] = Query(None, description="Filter by resolution status"),
     db: AsyncSession = Depends(get_db_session),
 ) -> Any:
-    """
-    Retrieve detected memory conflicts.
-    """
-    from sqlalchemy.future import select
-
+    """Retrieve detected memory conflicts."""
     stmt = select(ConflictReport)
     if resolved is not None:
-        stmt = stmt.where(ConflictReport.resolved == resolved)
+        stmt = stmt.where(ConflictReport.resolved.is_(resolved))
     result = await db.execute(stmt)
-    conflicts = result.scalars().all()
-    return conflicts
+    return result.scalars().all()
