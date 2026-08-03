@@ -1,5 +1,4 @@
 import shutil
-import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
@@ -17,14 +16,17 @@ class ArchiveImporter(BaseImporter):
         self.folder_importer = FolderImporter()
 
     async def import_manga(self, source: Path, manga_id: int) -> Dict[str, Any]:
-        """Imports a manga from a ZIP/CBZ archive."""
+        """Imports a manga from a ZIP/CBZ archive, keeping extracted files."""
         logger.info("importing_from_archive", source=str(source), manga_id=manga_id)
 
-        # Reject unsupported extensions
         if source.suffix.lower() not in [".zip", ".cbz"]:
             raise ValueError(f"Unsupported archive format: {source.suffix}")
 
-        extract_dir = Path(tempfile.mkdtemp())
+        # Extract to permanent storage location
+        from app.config.settings import settings
+        extract_dir = settings.storage.manga_dir / str(manga_id) / "extracted"
+        extract_dir.mkdir(parents=True, exist_ok=True)
+
         try:
             if source.suffix.lower() == ".zip":
                 await self.file_system_agent.extract_zip(source, extract_dir)
@@ -32,8 +34,9 @@ class ArchiveImporter(BaseImporter):
                 await self.file_system_agent.extract_cbz(source, extract_dir)
 
             return await self.folder_importer.import_manga(extract_dir, manga_id)
-        finally:
-            shutil.rmtree(extract_dir, ignore_errors=True)
+        except Exception as e:
+            logger.error("archive_import_failed", error=str(e))
+            raise
 
     async def validate_source(self, source: Path) -> bool:
         """Validates if source is a valid archive."""

@@ -150,3 +150,42 @@ class MockAIProvider(AIProviderInterface):
 
 
 ai_provider_manager.register_provider("mock", MockAIProvider(), is_default=True)
+
+_providers_registered = False
+
+
+def ensure_providers_registered() -> None:
+    """Register real providers from settings if not already done."""
+    global _providers_registered
+    if _providers_registered:
+        return
+
+    try:
+        from app.config.settings import settings
+
+        # Register OpenRouter provider if API keys are provided
+        if settings.openrouter.api_keys:
+            from app.shared.providers.openrouter_provider import OpenRouterProvider
+
+            openrouter = OpenRouterProvider(
+                api_keys=settings.openrouter.api_keys,
+                model_chain=settings.openrouter.model_chain,
+            )
+            ai_provider_manager.register_provider(
+                "openrouter", openrouter, is_default=(settings.ai.provider == "openrouter")
+            )
+
+        # Always register Edge TTS (free, no API key needed)
+        from app.shared.providers.edge_tts_provider import EdgeTTSProvider
+
+        edge_tts = EdgeTTSProvider(
+            default_voice=settings.tts.default_voice,
+            default_rate=settings.tts.default_rate,
+        )
+
+        _providers_registered = True
+
+    except Exception as e:
+        import logging
+
+        logging.warning(f"Failed to register providers from settings: {e}")

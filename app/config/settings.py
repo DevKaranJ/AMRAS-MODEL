@@ -4,6 +4,14 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
+# Default free model chain for OpenRouter
+DEFAULT_MODEL_CHAIN = [
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "google/gemma-4-26b-a4b-it:free",
+    "nvidia/nemotron-nano-12b-v2-vl:free",
+]
+
 # Base paths
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 DEFAULT_STORAGE_DIR = BASE_DIR / "storage"
@@ -50,6 +58,46 @@ class AIProviderSettings(BaseModel):
     api_key: Optional[str] = Field(default=None)
     model: str = Field(default="llama3")
     base_url: Optional[str] = Field(default=None)
+
+
+class OpenRouterSettings(BaseModel):
+    """OpenRouter multi-key provider settings."""
+
+    # Multiple API keys for rotation (comma-separated in .env)
+    api_keys: List[str] = Field(default_factory=list)
+
+    # Model fallback chain (primary → fallbacks)
+    model_chain: List[str] = Field(default=DEFAULT_MODEL_CHAIN)
+
+    # Rate limits (free tier)
+    rate_limit_rpm: int = Field(default=20)
+    rate_limit_rpd: int = Field(default=50)
+
+    @field_validator("api_keys", mode="before")
+    @classmethod
+    def parse_api_keys(cls, v: object) -> List[str]:
+        if isinstance(v, str):
+            return [k.strip() for k in v.split(",") if k.strip()]
+        return list(v) if v else []
+
+    @field_validator("model_chain", mode="before")
+    @classmethod
+    def parse_model_chain(cls, v: object) -> List[str]:
+        if isinstance(v, str):
+            return [m.strip() for m in v.split(",") if m.strip()]
+        return list(v) if v else DEFAULT_MODEL_CHAIN
+
+
+class TTSSettings(BaseModel):
+    """Text-to-Speech provider settings."""
+
+    provider: str = Field(default="edge", alias="TTS_PROVIDER")
+    default_voice: str = Field(default="en-US-GuyNeural")
+    default_rate: str = Field(default="+0%")
+
+    # ElevenLabs (future upgrade)
+    elevenlabs_api_key: Optional[str] = Field(default=None)
+    elevenlabs_voice_id: Optional[str] = Field(default=None)
 
 
 class StorageSettings(BaseModel):
@@ -106,6 +154,8 @@ class AppSettings(BaseSettings):
     db: DatabaseSettings = Field(default_factory=DatabaseSettings)
     log: LoggingSettings = Field(default_factory=LoggingSettings)
     ai: AIProviderSettings = Field(default_factory=AIProviderSettings)
+    openrouter: OpenRouterSettings = Field(default_factory=OpenRouterSettings)
+    tts: TTSSettings = Field(default_factory=TTSSettings)
     storage: StorageSettings = Field(default_factory=StorageSettings)
     video: VideoSettings = Field(default_factory=VideoSettings)
     ocr: OCRSettings = Field(default_factory=OCRSettings)

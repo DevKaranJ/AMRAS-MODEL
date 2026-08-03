@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from app.api.endpoints.ingestion import router as ingestion_router
 from app.api.endpoints.memory import router as memory_router
 from app.api.endpoints.ocr import router as ocr_router
+from app.api.endpoints.pipeline import router as pipeline_router
 from app.api.endpoints.production import router as production_router
 from app.api.endpoints.qa import router as qa_router
 from app.api.endpoints.story import router as story_router
@@ -30,6 +31,12 @@ app = FastAPI(
     version=settings.version,
     description="API for AI Manga Recap Automation System",
 )
+
+
+@app.on_event("startup")
+async def startup_register_providers() -> None:
+    from app.shared.providers.base import ensure_providers_registered
+    ensure_providers_registered()
 
 # ---------------------------------------------------------------------- #
 # CORS middleware                                                          #
@@ -60,6 +67,7 @@ app.include_router(youtube_router, tags=["youtube", "publishing"], dependencies=
 app.include_router(thumbnails_router, prefix="/thumbnail", tags=["thumbnails"], dependencies=_auth)
 app.include_router(qa_router, prefix="/qa", tags=["qa"], dependencies=_auth)
 app.include_router(production_router, prefix="/production", tags=["production"], dependencies=_auth)
+app.include_router(pipeline_router, prefix="/pipeline", tags=["pipeline"], dependencies=_auth)
 
 
 # ---------------------------------------------------------------------- #

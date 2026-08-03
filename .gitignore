@@ -57,3 +57,12 @@ logs/
 .env
 dev.db
 *.db
+
+# Storage (manga images, videos, audio)
+storage/
+
+# OpenCode
+.opencode/
+
+# Graphify outputs
+graphify-out/
