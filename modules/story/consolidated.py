@@ -189,7 +189,7 @@ CRITICAL RULES:
 - Reference specific visual moments from the panels
 - Match the manga's emotion (romance, action, drama, etc.)
 - Target {target_seconds} seconds total (roughly {target_words} words)
-- End each segment at a natural pause point for TTS
+- End each segment at a natural pause point for TTS"""
 
     user_prompt = f"""Manga Recap Narration
 

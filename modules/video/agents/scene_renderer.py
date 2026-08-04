@@ -3,6 +3,7 @@
 Renders individual scenes with Ken Burns effects, transitions, and audio overlay.
 """
 
+import os
 import subprocess
 import shutil
 from pathlib import Path
@@ -81,7 +82,7 @@ class SceneRendererAgent:
     async def execute(self, input_data: SceneRendererInput) -> SceneRendererOutput:
         """Render a single scene from an image with Ken Burns effect."""
         try:
-            if not Path(input_data.image_path).exists():
+            if not os.path.exists(input_data.image_path):
                 raise SceneRenderError(f"Image not found: {input_data.image_path}")
 
             # Build FFmpeg filter based on camera effect
@@ -93,7 +94,7 @@ class SceneRendererAgent:
                 "-i", input_data.image_path,
             ]
 
-            if input_data.audio_path and Path(input_data.audio_path).exists():
+            if input_data.audio_path and os.path.exists(input_data.audio_path):
                 args.extend(["-i", input_data.audio_path])
 
             args.extend([
@@ -105,7 +106,7 @@ class SceneRendererAgent:
                 "-pix_fmt", "yuv420p",
             ])
 
-            if input_data.audio_path and Path(input_data.audio_path).exists():
+            if input_data.audio_path and os.path.exists(input_data.audio_path):
                 args.extend(["-c:a", "aac", "-b:a", "128k"])
             else:
                 args.extend(["-an"])

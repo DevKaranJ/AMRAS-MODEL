@@ -4,6 +4,7 @@ This module implements production-quality panel detection using OpenCV
 contour analysis, edge detection, and morphological operations.
 """
 
+import os
 import cv2
 import numpy as np
 from pathlib import Path
@@ -252,7 +253,7 @@ class VisionAgent(BaseAgent):
         image_path = payload.get("image_path", "")
         reading_order = payload.get("reading_order", "right-to-left")
 
-        if not image_path or not Path(image_path).exists():
+        if not image_path or not os.path.exists(image_path):
             # Return mock data if no image provided (for testing)
             return {
                 "page": payload.get("page_id", 1),
@@ -331,7 +332,7 @@ class LayoutAgent(BaseAgent):
         panels_data = payload.get("panels", [])
 
         # If no panels provided, detect them
-        if not panels_data and image_path and Path(image_path).exists():
+        if not panels_data and image_path and os.path.exists(image_path):
             panels = self.detector.detect_panels(image_path)
             panels_data = [p.to_dict() for p in panels]
 
@@ -536,7 +537,7 @@ class SceneAnalysisAgent(BaseAgent):
 
         image_path = payload.get("image_path", "")
 
-        if image_path and Path(image_path).exists():
+        if image_path and os.path.exists(image_path):
             img = cv2.imread(image_path)
             if img is not None:
                 scene_type, emotion = self._analyze_color_mood(img)

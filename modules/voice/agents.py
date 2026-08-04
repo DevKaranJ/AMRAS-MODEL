@@ -7,6 +7,7 @@ Uses FFmpeg for:
 - Audio format conversion
 """
 
+import os
 import subprocess
 import shutil
 from pathlib import Path
@@ -311,7 +312,7 @@ class QualityAssuranceAgent:
         issues = []
 
         # Check file exists
-        if not Path(file_path).exists():
+        if not os.path.exists(file_path):
             issues.append({
                 "type": "file_missing",
                 "severity": "error",

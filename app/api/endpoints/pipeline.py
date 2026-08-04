@@ -11,7 +11,9 @@ Orchestrates the complete workflow:
 8. Video rendering (FFmpeg) — local
 """
 
+import os
 import shutil
+import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -148,7 +150,7 @@ async def _run_full_pipeline(
                 # Use actual image path from page
                 image_path = page.image_path
 
-                if image_path and Path(image_path).exists():
+                if image_path and os.path.exists(image_path):
                     # Run local vision analysis
                     try:
                         vision_result = await vision_agent.execute({
@@ -159,6 +161,16 @@ async def _run_full_pipeline(
                         # Add image_path to each panel for video rendering
                         for p in panels:
                             p["image_path"] = image_path
+                        # If no panels detected, use the entire page as one panel
+                        if not panels:
+                            panels = [{
+                                "page_id": page.id,
+                                "panel_id": 1,
+                                "bounding_box": {"x": 0, "y": 0, "w": 1920, "h": 1080},
+                                "scene_type": "normal",
+                                "speech_bubbles": [],
+                                "image_path": image_path,
+                            }]
                         all_panels.extend(panels)
                     except Exception as e:
                         logger.warning("vision_failed", page_id=page.id, error=str(e))
@@ -217,6 +229,7 @@ async def _run_full_pipeline(
 
             # Extract script text from narration segments
             narration_segments = narration_result.get("segments", []) if narration_result else []
+            logger.info("narration_segments_count", count=len(narration_segments))
             script_text = "\n\n".join([s.get("text", "") for s in narration_segments])
 
             # Step 6: Voice generation — Edge TTS (free, no API calls)
@@ -253,16 +266,13 @@ async def _run_full_pipeline(
 
                 pipeline_jobs[job_id].progress = 65.0 + (i / max(1, len(narration_segments))) * 10.0
 
+            logger.info("voice_generation_done", audio_count=len(audio_files))
             if not audio_files:
                 logger.warning("no_audio_generated", segments=len(narration_segments))
 
             # Stitch audio with FFmpeg
             master_audio = audio_dir / "master_narration.mp3"
             if audio_files:
-                import shutil
-                import subprocess
-                import os
-
                 # Ensure FFmpeg is findable
                 ffmpeg_path = shutil.which("ffmpeg")
                 if not ffmpeg_path:
@@ -277,8 +287,7 @@ async def _run_full_pipeline(
 
                 if ffmpeg_path and len(audio_files) == 1:
                     # Single file, just copy
-                    import shutil as _shutil
-                    _shutil.copy2(audio_files[0], str(master_audio))
+                    shutil.copy2(audio_files[0], str(master_audio))
                 elif ffmpeg_path and len(audio_files) > 1:
                     concat_file = audio_dir / "concat.txt"
                     with open(concat_file, "w") as f:
@@ -292,14 +301,12 @@ async def _run_full_pipeline(
                     except Exception as e:
                         logger.warning("ffmpeg_concat_failed", error=str(e))
                         # Fallback: just use first segment
-                        import shutil as _shutil
-                        _shutil.copy2(audio_files[0], str(master_audio))
+                        shutil.copy2(audio_files[0], str(master_audio))
                     finally:
                         concat_file.unlink(missing_ok=True)
                 elif audio_files:
                     # No FFmpeg, just use first segment
-                    import shutil as _shutil
-                    _shutil.copy2(audio_files[0], str(master_audio))
+                    shutil.copy2(audio_files[0], str(master_audio))
 
             # Step 7-9: Timeline + Video — wrapped in try/except, audio always saved
             final_output = None
@@ -327,6 +334,8 @@ async def _run_full_pipeline(
                     except Exception:
                         scenes.append({"panel": panel, "duration": 4.0, "camera_effect": "zoom_in"})
 
+                logger.info("timeline_done", scene_count=len(scenes), panel_count=len(all_panels))
+
                 # Step 8: Video rendering
                 pipeline_jobs[job_id].current_step = "video_rendering"
                 pipeline_jobs[job_id].progress = 85.0
@@ -338,12 +347,13 @@ async def _run_full_pipeline(
                 scene_clips = []
                 video_dir = Path(output_dir) / "scenes"
                 video_dir.mkdir(parents=True, exist_ok=True)
+                video_dir_abs = video_dir.resolve()
 
                 for i, scene in enumerate(scenes):
                     panel = scene["panel"]
                     image_path = panel.get("image_path", "")
-                    if image_path and Path(image_path).exists():
-                        clip_path = str(video_dir / f"scene_{i:04d}.mp4")
+                    if image_path and os.path.exists(image_path):
+                        clip_path = str(video_dir_abs / f"scene_{i:04d}.mp4")
                         renderer_input = SceneRendererInput(
                             image_path=image_path,
                             audio_path=str(master_audio) if i == 0 else None,
@@ -363,15 +373,15 @@ async def _run_full_pipeline(
                 pipeline_jobs[job_id].current_step = "final_encoding"
                 pipeline_jobs[job_id].progress = 95.0
                 final_output = Path(output_dir) / f"manga_{manga_id}_final.mp4"
+                final_output_abs = final_output.resolve()
 
                 if scene_clips:
-                    concat_file = video_dir / "concat.txt"
+                    concat_file = video_dir_abs / "concat.txt"
                     with open(concat_file, "w") as f:
                         for clip in scene_clips:
                             f.write(f"file '{clip}'\n")
-                    import subprocess
                     ffmpeg = shutil.which("ffmpeg") or "ffmpeg"
-                    subprocess.run([ffmpeg, "-y", "-f", "concat", "-safe", "0", "-i", str(concat_file), "-c", "copy", str(final_output)], capture_output=True, timeout=300)
+                    subprocess.run([ffmpeg, "-y", "-f", "concat", "-safe", "0", "-i", str(concat_file), "-c:v", "libx264", "-preset", "fast", "-crf", "23", "-pix_fmt", "yuv420p", str(final_output_abs)], capture_output=True, timeout=300)
                     concat_file.unlink(missing_ok=True)
 
             except Exception as e:
@@ -382,7 +392,7 @@ async def _run_full_pipeline(
             pipeline_jobs[job_id].progress = 100.0
             pipeline_jobs[job_id].current_step = "completed"
             pipeline_jobs[job_id].message = "Pipeline completed!"
-            pipeline_jobs[job_id].output_path = str(final_output) if final_output else str(master_audio)
+            pipeline_jobs[job_id].output_path = str(final_output_abs) if final_output and final_output_abs.exists() else str(master_audio)
 
             logger.info(
                 "pipeline_completed",

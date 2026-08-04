@@ -38,8 +38,8 @@ class SceneCompositionAgent:
     }
 
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.config = config or {}
-        self.default_duration = config.get("default_duration", 4.0)
+        self.config = config if config is not None else {}
+        self.default_duration = self.config.get("default_duration", 4.0)
 
     def analyze_scene(
         self, scene_data: Dict[str, Any], pages_data: List[Dict[str, Any]]

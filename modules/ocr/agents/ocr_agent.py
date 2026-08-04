@@ -4,6 +4,7 @@ Uses OpenCV for text region detection and prepares regions for OCR.
 Supports multiple OCR backends (PaddleOCR, Tesseract, cloud APIs).
 """
 
+import os
 import cv2
 import numpy as np
 from pathlib import Path
@@ -274,7 +275,7 @@ class OCRAgent(BaseAgent):
 
         image_path = payload.get("image_path", "")
 
-        if not image_path or not Path(image_path).exists():
+        if not image_path or not os.path.exists(image_path):
             return {
                 "speech_bubbles": [],
                 "narrations": [],
@@ -399,7 +400,7 @@ class SoundEffectAgent(BaseAgent):
         image_path = payload.get("image_path", "")
         regions_data = payload.get("regions", [])
 
-        if not image_path or not Path(image_path).exists():
+        if not image_path or not os.path.exists(image_path):
             return {"sound_effects": []}
 
         try:

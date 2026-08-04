@@ -3,6 +3,7 @@
 Handles final video encoding with multi-pass, subtitle burn-in, and format conversion.
 """
 
+import os
 import subprocess
 import shutil
 from pathlib import Path
@@ -93,7 +94,7 @@ class EncodingAgent:
     async def execute(self, input_data: EncodingInput) -> EncodingOutput:
         """Encode video with specified settings."""
         try:
-            if not Path(input_data.input_path).exists():
+            if not os.path.exists(input_data.input_path):
                 raise EncodingError(f"Input file not found: {input_data.input_path}")
 
             # Parse resolution
@@ -114,7 +115,7 @@ class EncodingAgent:
             ]
 
             # Add subtitle burn-in if provided
-            if input_data.subtitle_path and Path(input_data.subtitle_path).exists():
+            if input_data.subtitle_path and os.path.exists(input_data.subtitle_path):
                 subtitle_filter = self._build_subtitle_filter(input_data)
                 args.extend(["-vf", subtitle_filter])
 
